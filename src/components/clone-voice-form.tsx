@@ -17,11 +17,7 @@ import type { Voice } from "./generate-voice-form";
 const formSchema = z.object({
   voiceName: z.string().min(1, "Please enter a name for your voice."),
   audioFile: (typeof window !== 'undefined' ? z.instanceof(File) : z.any())
-    .refine((file) => file && file.size > 0, "Please upload an audio file.")
-    .refine(
-      (file) => file && /\.(mp3|wav|m4a)$/i.test(file.name),
-      "Only .mp3, .wav, and .m4a files are accepted."
-    ),
+    .refine((file) => file && file.size > 0, "Please upload an audio file."),
 });
 
 interface CloneVoiceFormProps {
@@ -46,6 +42,16 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
     setLoading(true);
     setClonedResult(null);
     setIsCopied(false);
+
+    if (!/\.(mp3|wav|m4a)$/i.test(values.audioFile.name)) {
+        toast({
+            variant: "destructive",
+            title: "Invalid File Type",
+            description: "Only .mp3, .wav, and .m4a files are accepted.",
+        });
+        setLoading(false);
+        return;
+    }
 
     const reader = new FileReader();
     reader.readAsDataURL(values.audioFile);
