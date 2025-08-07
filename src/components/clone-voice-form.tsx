@@ -19,7 +19,7 @@ const formSchema = z.object({
   audioFile: (typeof window !== 'undefined' ? z.instanceof(File) : z.any())
     .refine((file) => file && file.size > 0, "Please upload an audio file.")
     .refine(
-      (file) => file && ["audio/mpeg", "audio/wav", "audio/mp3", "audio/x-wav", "audio/m4a", "audio/x-m4a"].includes(file.type),
+      (file) => file && ["audio/mpeg", "audio/wav", "audio/mp3", "audio/x-wav", "audio/m4a", "audio/x-m4a", "audio/mp4"].includes(file.type),
       "Only .mp3, .wav, and .m4a files are accepted."
     ),
 });
