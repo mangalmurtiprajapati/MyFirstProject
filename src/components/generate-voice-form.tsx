@@ -11,12 +11,12 @@ import { Loader2, Bot, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const voices = [
-  { value: "Algenib", label: "Male Voice 1" },
-  { value: "Achernar", label: "Female Voice 1" },
-  { value: "Hadar", label: "Male Voice 2" },
-  { value: "Sirius", label: "Female Voice 2" },
-  { value: "Rigel", label: "Male Voice 3" },
-  { value: "Antares", label: "Female Voice 3" },
+  { value: "algenib", label: "Male Voice 1" },
+  { value: "achernar", label: "Female Voice 1" },
+  { value: "gacrux", label: "Male Voice 2" },
+  { value: "schedar", label: "Female Voice 2" },
+  { value: "zubenelgenubi", label: "Male Voice 3" },
+  { value: "vindemiatrix", label: "Female Voice 3" },
 ];
 
 export function GenerateVoiceForm() {
@@ -60,7 +60,7 @@ export function GenerateVoiceForm() {
     <Card className="w-full shadow-lg border-border/60">
       <CardHeader>
         <CardTitle>Generate a Synthetic Voice</CardTitle>
-        <CardDescription>Enter some dialogue in Hindi to convert it into speech.</CardDescription>
+        <CardDescription>Enter some dialogue to convert it into speech.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
@@ -84,7 +84,7 @@ export function GenerateVoiceForm() {
             id="dialogue"
             value={dialogue}
             onChange={(e) => setDialogue(e.target.value)}
-            placeholder="Enter your dialogue in Hindi here..."
+            placeholder="Enter your dialogue here..."
             className="min-h-[120px]"
           />
         </div>
