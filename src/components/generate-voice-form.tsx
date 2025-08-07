@@ -74,11 +74,21 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
       });
     } catch (error) {
       console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem generating the voice. Please try again.",
-      });
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+      if (errorMessage.includes("429 Too Many Requests")) {
+        toast({
+            variant: "destructive",
+            title: "Daily Limit Reached",
+            description: "You've exceeded the free daily quota for voice generation. Please try again tomorrow.",
+            duration: 9000,
+        });
+      } else {
+        toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: "There was a problem generating the voice. Please try again.",
+        });
+      }
     } finally {
       setLoading(false);
     }
