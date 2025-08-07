@@ -17,11 +17,13 @@ const CloneVoiceInputSchema = z.object({
     .describe(
       "A 1-2 minute audio sample of the voice to be cloned, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  voiceName: z.string().describe('The name for the cloned voice.'),
 });
 export type CloneVoiceInput = z.infer<typeof CloneVoiceInputSchema>;
 
 const CloneVoiceOutputSchema = z.object({
   clonedVoiceModel: z.string().describe('The cloned voice model in text-to-speech format.'),
+  voiceName: z.string().describe('The name of the cloned voice.'),
 });
 export type CloneVoiceOutput = z.infer<typeof CloneVoiceOutputSchema>;
 
@@ -37,7 +39,9 @@ const prompt = ai.definePrompt({
 
 You will take the provided audio sample and create a text-to-speech voice model that sounds like the person in the sample.
 
-Return the voice model.
+The user has named this voice "{{voiceName}}".
+
+Return the voice model and the voice name.
 
 Audio Sample: {{media url=audioSampleDataUri}}`,
 });
@@ -50,6 +54,7 @@ const cloneVoiceFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    // Add the voiceName to the output since the prompt might not return it reliably.
+    return { ...output!, voiceName: input.voiceName };
   }
 );
