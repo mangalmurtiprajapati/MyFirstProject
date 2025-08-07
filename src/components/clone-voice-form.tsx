@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Clipboard, Check, Sparkles, Music4 } from "lucide-react";
+import { Loader2, Upload, Clipboard, Check, Sparkles } from "lucide-react";
 import type { Voice } from "./generate-voice-form";
+import { Label } from "./ui/label";
 
 const formSchema = z.object({
   voiceName: z.string().min(1, "Please enter a name for your voice."),
@@ -23,9 +23,10 @@ const formSchema = z.object({
 
 interface CloneVoiceFormProps {
     onVoiceCloned: (voice: Voice) => void;
+    allVoices: Voice[];
 }
 
-export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
+export function CloneVoiceForm({ onVoiceCloned, allVoices }: CloneVoiceFormProps) {
   const [loading, setLoading] = useState(false);
   const [clonedResult, setClonedResult] = useState<CloneVoiceOutput | null>(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -74,7 +75,12 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
     reader.onload = async () => {
       const audioSampleDataUri = reader.result as string;
       try {
-        const result = await cloneVoice({ audioSampleDataUri, voiceName: values.voiceName });
+        const result = await cloneVoice({ 
+          audioSampleDataUri, 
+          voiceName: values.voiceName,
+          // Pass a random voice from the available list for simulation
+          voiceToSimulate: allVoices[Math.floor(Math.random() * allVoices.length)].value
+        });
         setClonedResult(result);
         onVoiceCloned({ value: result.clonedVoiceModel, label: result.voiceName });
         toast({
@@ -82,6 +88,7 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
           description: `Your new voice "${result.voiceName}" is ready and has been added to the 'Generate Voice' tab.`,
         });
         form.reset();
+        setPreviewUrl(null);
       } catch (error) {
         console.error(error);
         toast({
@@ -113,22 +120,22 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
   };
 
   return (
-    <Card className="w-full shadow-lg border-border/60">
+    <Card className="w-full shadow-xl border-border/60 bg-card/80 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Clone a Voice</CardTitle>
-        <CardDescription>Upload a 1-2 minute audio sample (.mp3, .wav, or .m4a) to clone a voice.</CardDescription>
+        <CardTitle className="text-2xl font-bold">Clone a Voice</CardTitle>
+        <CardDescription>Upload a 1-2 minute audio sample to simulate cloning a new voice.</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <FormField
               control={form.control}
               name="voiceName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Voice Name</FormLabel>
+                  <FormLabel className="text-lg">Voice Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Morgan's Voice" {...field} />
+                    <Input placeholder="e.g., Morgan's Voice" {...field} className="h-12 text-base" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -139,15 +146,24 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
               name="audioFile"
               render={({ field: { onChange, value, ...rest } }) => (
                 <FormItem>
-                  <FormLabel>Audio Sample</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept=".mp3,.wav,.m4a"
-                      onChange={(e) => onChange(e.target.files?.[0])}
-                      className="file:text-primary-foreground"
-                      {...rest}
-                    />
+                  <FormLabel className="text-lg">Audio Sample</FormLabel>
+                   <FormControl>
+                    <label className="block w-full cursor-pointer rounded-lg border-2 border-dashed border-border/80 p-6 text-center hover:border-primary/60 transition-colors">
+                      <Upload className="mx-auto h-10 w-10 text-muted-foreground" />
+                      <span className="mt-2 block text-sm font-semibold text-foreground">
+                        {value?.name || "Click to upload or drag and drop"}
+                      </span>
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        MP3, WAV, or M4A (Max 10MB)
+                      </span>
+                      <Input
+                        type="file"
+                        accept=".mp3,.wav,.m4a"
+                        onChange={(e) => onChange(e.target.files?.[0])}
+                        className="sr-only"
+                        {...rest}
+                      />
+                    </label>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,8 +178,8 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
                 </div>
             )}
           </CardContent>
-          <CardFooter className="flex-col items-stretch gap-4">
-            <Button type="submit" disabled={loading}>
+          <CardFooter className="flex-col items-stretch gap-4 p-6">
+            <Button type="submit" disabled={loading} size="lg" className="h-14 text-lg font-bold">
               {loading ? (
                 <>
                   <Loader2 className="animate-spin" />
@@ -171,8 +187,8 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
                 </>
               ) : (
                 <>
-                  <Upload />
-                  Clone Voice
+                  <Sparkles className="mr-2 h-5 w-5"/>
+                  Simulate Voice Clone
                 </>
               )}
             </Button>
@@ -192,7 +208,7 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
                     </p>
                 </div>
                 
-                <div className="relative rounded-md bg-background/50 border p-3 pr-12 font-mono text-sm">
+                <div className="relative rounded-md bg-muted/50 border p-3 pr-12 font-mono text-sm">
                   <p className="break-words">{clonedResult.clonedVoiceModel}</p>
                   <Button
                     variant="ghost"

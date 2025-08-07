@@ -19,6 +19,7 @@ const CloneVoiceInputSchema = z.object({
       "A 1-2 minute audio sample of the voice to be cloned, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'"
     ),
   voiceName: z.string().describe('The name for the cloned voice.'),
+  voiceToSimulate: z.string().describe('A pre-existing voice model to use for the simulation.'),
 });
 export type CloneVoiceInput = z.infer<typeof CloneVoiceInputSchema>;
 
@@ -43,19 +44,10 @@ const cloneVoiceFlow = ai.defineFlow(
     outputSchema: CloneVoiceOutputSchema,
   },
   async (input) => {
-    const supportedVoices = [
-        "algenib", "achernar", "gacrux", "schedar", "zubenelgenubi", 
-        "vindemiatrix", "achird", "alnilam", "aoede", "autonoe", 
-        "callirrhoe", "charon", "despina", "enceladus", "erinome", 
-        "fenrir", "iapetus", "kore", "laomedeia", "leda", "orus", 
-        "puck", "pulcherrima", "rasalgethi", "sadachbia", "sadaltager", "sulafat", "umbriel"
-    ];
-
-    // Select a random voice from the list to simulate a new cloned voice
-    const randomVoice = supportedVoices[Math.floor(Math.random() * supportedVoices.length)];
-
+    // In a real scenario, you'd use the audio sample. Here, we simulate by using
+    // a pre-selected voice passed from the frontend.
     return {
-      clonedVoiceModel: randomVoice,
+      clonedVoiceModel: input.voiceToSimulate,
       voiceName: input.voiceName,
     };
   }

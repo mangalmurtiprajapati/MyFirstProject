@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Bot, Download } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Loader2, Bot, Download, Mic, User, SparklesIcon } from "lucide-react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from './ui/select';
 
 export interface Voice {
     value: string;
@@ -18,9 +18,14 @@ export interface Voice {
 
 interface GenerateVoiceFormProps {
     voices: Voice[];
+    voiceCategories: {
+        male: Voice[];
+        female: Voice[];
+        unique: Voice[];
+    }
 }
 
-export function GenerateVoiceForm({ voices }: GenerateVoiceFormProps) {
+export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceFormProps) {
   const [loading, setLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [dialogue, setDialogue] = useState("");
@@ -64,40 +69,67 @@ export function GenerateVoiceForm({ voices }: GenerateVoiceFormProps) {
   };
   
   return (
-    <Card className="w-full shadow-lg border-border/60">
+    <Card className="w-full shadow-xl border-border/60 bg-card/80 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Generate a Synthetic Voice</CardTitle>
+        <CardTitle className="text-2xl font-bold">Generate a Synthetic Voice</CardTitle>
         <CardDescription>Select a voice and enter some dialogue to convert it into speech.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-            <Label htmlFor="voice">Voice</Label>
+            <Label htmlFor="voice" className="text-lg">Voice</Label>
             <Select onValueChange={setVoice} value={voice}>
-              <SelectTrigger id="voice">
+              <SelectTrigger id="voice" className="h-12 text-base">
                 <SelectValue placeholder="Select a voice" />
               </SelectTrigger>
               <SelectContent>
-                {voices.map((v) => (
-                  <SelectItem key={v.value} value={v.value}>
-                    {v.label}
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  <SelectLabel className="flex items-center gap-2"><User className="h-4 w-4" />Male Voices</SelectLabel>
+                  {voiceCategories.male.map((v) => (
+                    <SelectItem key={v.value} value={v.value}>
+                      {v.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel className="flex items-center gap-2"><User className="h-4 w-4" />Female Voices</SelectLabel>
+                  {voiceCategories.female.map((v) => (
+                    <SelectItem key={v.value} value={v.value}>
+                      {v.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                 <SelectGroup>
+                  <SelectLabel className="flex items-center gap-2"><SparklesIcon className="h-4 w-4" />Unique Voices</SelectLabel>
+                  {voiceCategories.unique.map((v) => (
+                    <SelectItem key={v.value} value={v.value}>
+                      {v.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel className="flex items-center gap-2"><Mic className="h-4 w-4" />Cloned Voices</SelectLabel>
+                  {voices.filter(v => !voiceCategories.male.includes(v) && !voiceCategories.female.includes(v) && !voiceCategories.unique.includes(v)).map((v) => (
+                    <SelectItem key={v.value} value={v.value}>
+                      {v.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
         <div className="space-y-2">
-          <Label htmlFor="dialogue">Dialogue</Label>
+          <Label htmlFor="dialogue" className="text-lg">Dialogue</Label>
           <Textarea
             id="dialogue"
             value={dialogue}
             onChange={(e) => setDialogue(e.target.value)}
             placeholder="Enter your dialogue here..."
-            className="min-h-[120px]"
+            className="min-h-[120px] text-base"
           />
         </div>
       </CardContent>
-      <CardFooter className="flex-col items-stretch gap-4">
-        <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice}>
+      <CardFooter className="flex-col items-stretch gap-4 p-6">
+        <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice} size="lg" className="h-14 text-lg font-bold">
           {loading ? (
             <>
               <Loader2 className="animate-spin" />
@@ -112,7 +144,7 @@ export function GenerateVoiceForm({ voices }: GenerateVoiceFormProps) {
         </Button>
         {audioUrl && (
           <div className="mt-4 flex flex-col gap-4 animate-in fade-in-50">
-             <div className="rounded-lg border bg-background p-4 space-y-4">
+             <div className="rounded-lg border bg-muted/50 p-4 space-y-4">
                 <h3 className="font-semibold text-lg">Your Generated Voice</h3>
                 <audio controls src={audioUrl} className="w-full">
                     Your browser does not support the audio element.
