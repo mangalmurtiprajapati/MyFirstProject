@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -11,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, Clipboard, Check, Sparkles } from "lucide-react";
+import type { Voice } from "./generate-voice-form";
 
 const formSchema = z.object({
   voiceName: z.string().min(1, "Please enter a name for your voice."),
@@ -22,7 +24,11 @@ const formSchema = z.object({
     ),
 });
 
-export function CloneVoiceForm() {
+interface CloneVoiceFormProps {
+    onVoiceCloned: (voice: Voice) => void;
+}
+
+export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
   const [loading, setLoading] = useState(false);
   const [clonedResult, setClonedResult] = useState<CloneVoiceOutput | null>(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -48,10 +54,12 @@ export function CloneVoiceForm() {
       try {
         const result = await cloneVoice({ audioSampleDataUri, voiceName: values.voiceName });
         setClonedResult(result);
+        onVoiceCloned({ value: result.clonedVoiceModel, label: result.voiceName });
         toast({
           title: "Voice Cloned Successfully!",
-          description: `Your new voice "${result.voiceName}" is ready to be used.`,
+          description: `Your new voice "${result.voiceName}" is ready and has been added to the 'Generate Voice' tab.`,
         });
+        form.reset();
       } catch (error) {
         console.error(error);
         toast({

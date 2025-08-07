@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { generateSyntheticVoice } from "@/ai/flows/generate-synthetic-voice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,22 +11,28 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Bot, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-const voices = [
-  { value: "algenib", label: "Male Voice 1" },
-  { value: "achernar", label: "Female Voice 1" },
-  { value: "gacrux", label: "Male Voice 2" },
-  { value: "schedar", label: "Female Voice 2" },
-  { value: "zubenelgenubi", label: "Male Voice 3" },
-  { value: "vindemiatrix", label: "Female Voice 3" },
-];
+export interface Voice {
+    value: string;
+    label: string;
+}
 
-export function GenerateVoiceForm() {
+interface GenerateVoiceFormProps {
+    voices: Voice[];
+}
+
+export function GenerateVoiceForm({ voices }: GenerateVoiceFormProps) {
   const [loading, setLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [dialogue, setDialogue] = useState("");
-  const [voice, setVoice] = useState(voices[0].value);
+  const [voice, setVoice] = useState(voices.length > 0 ? voices[0].value : "");
   
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (voices.length > 0 && !voices.find(v => v.value === voice)) {
+      setVoice(voices[voices.length-1].value);
+    }
+  }, [voices, voice]);
 
   const handleGenerate = async () => {
     if (!dialogue) {
@@ -60,12 +67,12 @@ export function GenerateVoiceForm() {
     <Card className="w-full shadow-lg border-border/60">
       <CardHeader>
         <CardTitle>Generate a Synthetic Voice</CardTitle>
-        <CardDescription>Enter some dialogue to convert it into speech.</CardDescription>
+        <CardDescription>Select a voice and enter some dialogue to convert it into speech.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
             <Label htmlFor="voice">Voice</Label>
-            <Select onValueChange={setVoice} defaultValue={voice}>
+            <Select onValueChange={setVoice} value={voice}>
               <SelectTrigger id="voice">
                 <SelectValue placeholder="Select a voice" />
               </SelectTrigger>
@@ -90,7 +97,7 @@ export function GenerateVoiceForm() {
         </div>
       </CardContent>
       <CardFooter className="flex-col items-stretch gap-4">
-        <Button onClick={handleGenerate} disabled={loading || !dialogue}>
+        <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice}>
           {loading ? (
             <>
               <Loader2 className="animate-spin" />
