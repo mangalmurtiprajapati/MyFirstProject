@@ -7,12 +7,23 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Bot, Download, Play } from "lucide-react";
+import { Loader2, Bot, Download } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+
+const voices = [
+  { value: "Algenib", label: "Male Voice 1" },
+  { value: "Achernar", label: "Female Voice 1" },
+  { value: "Hadar", label: "Male Voice 2" },
+  { value: "Sirius", label: "Female Voice 2" },
+  { value: "Rigel", label: "Male Voice 3" },
+  { value: "Antares", label: "Female Voice 3" },
+];
 
 export function GenerateVoiceForm() {
   const [loading, setLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [dialogue, setDialogue] = useState("");
+  const [voice, setVoice] = useState(voices[0].value);
   
   const { toast } = useToast();
 
@@ -27,7 +38,7 @@ export function GenerateVoiceForm() {
     setLoading(true);
     setAudioUrl(null);
     try {
-      const result = await generateSyntheticVoice({ dialogue });
+      const result = await generateSyntheticVoice({ dialogue, voice });
       setAudioUrl(result.audioDataUri);
       toast({
         title: "Voice Generated!",
@@ -52,6 +63,21 @@ export function GenerateVoiceForm() {
         <CardDescription>Enter some dialogue in Hindi to convert it into speech.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        <div className="space-y-2">
+            <Label htmlFor="voice">Voice</Label>
+            <Select onValueChange={setVoice} defaultValue={voice}>
+              <SelectTrigger id="voice">
+                <SelectValue placeholder="Select a voice" />
+              </SelectTrigger>
+              <SelectContent>
+                {voices.map((v) => (
+                  <SelectItem key={v.value} value={v.value}>
+                    {v.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         <div className="space-y-2">
           <Label htmlFor="dialogue">Dialogue</Label>
           <Textarea

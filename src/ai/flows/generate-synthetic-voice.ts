@@ -13,6 +13,7 @@ import wav from 'wav';
 
 const GenerateSyntheticVoiceInputSchema = z.object({
   dialogue: z.string().describe('The dialogue to be converted to voice.'),
+  voice: z.string().describe('The selected voice for generation.'),
 });
 export type GenerateSyntheticVoiceInput = z.infer<
   typeof GenerateSyntheticVoiceInputSchema
@@ -46,6 +47,11 @@ const generateSyntheticVoiceFlow = ai.defineFlow(
       model: 'googleai/gemini-2.5-flash-preview-tts',
       config: {
         responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName: input.voice },
+          },
+        },
       },
       prompt: input.dialogue,
     });
