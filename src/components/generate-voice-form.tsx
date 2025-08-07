@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Bot, Download, Mic, User, SparklesIcon, Music4 } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from './ui/select';
+import { useAppContext, HistoryItem } from './app-provider';
 
 export interface Voice {
     value: string;
@@ -26,16 +27,18 @@ interface GenerateVoiceFormProps {
 }
 
 export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceFormProps) {
+  const { setHistory } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [dialogue, setDialogue] = useState("");
-  const [voice, setVoice] = useState(voices.length > 0 ? voices[0].value : "");
+  const [voice, setVoice] = useState(voices.length > 0 ? voiceCategories.male[0].value : "");
   
   const { toast } = useToast();
 
   useEffect(() => {
     // If a new voice is added (cloned), select it automatically.
-    if (voices.length > 0 && !voices.find(v => v.value === voice)) {
+    const allVoiceValues = voices.map(v => v.value);
+    if (voices.length > 0 && !allVoiceValues.includes(voice)) {
       setVoice(voices[voices.length-1].value);
     }
   }, [voices, voice]);
@@ -53,9 +56,21 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     try {
       const result = await generateSyntheticVoice({ dialogue, voice });
       setAudioUrl(result.audioDataUri);
+
+      const newHistoryItem: HistoryItem = {
+        id: new Date().toISOString(),
+        dialogue,
+        voice: voices.find(v => v.value === voice)?.label || voice,
+        audioUrl: result.audioDataUri,
+        timestamp: new Date(),
+        isFavorite: false,
+      };
+
+      setHistory(prev => [newHistoryItem, ...prev]);
+
       toast({
         title: "Voice Generated!",
-        description: "Listen to your new synthetic voice below.",
+        description: "Listen to your new synthetic voice below. It's been saved to your history.",
       });
     } catch (error) {
       console.error(error);
