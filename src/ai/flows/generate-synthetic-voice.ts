@@ -12,11 +12,7 @@ import {z} from 'genkit';
 import wav from 'wav';
 
 const GenerateSyntheticVoiceInputSchema = z.object({
-  description: z
-    .string()
-    .describe(
-      'Description of the desired voice, including tone, pitch, and style.'
-    ),
+  dialogue: z.string().describe('The dialogue to be converted to voice.'),
 });
 export type GenerateSyntheticVoiceInput = z.infer<
   typeof GenerateSyntheticVoiceInputSchema
@@ -39,18 +35,6 @@ export async function generateSyntheticVoice(
   return generateSyntheticVoiceFlow(input);
 }
 
-const generateSyntheticVoicePrompt = ai.definePrompt({
-  name: 'generateSyntheticVoicePrompt',
-  input: {schema: GenerateSyntheticVoiceInputSchema},
-  output: {schema: GenerateSyntheticVoiceOutputSchema},
-  prompt: `You are a voice generation expert. Generate a voice based on the
-following description:
-
-{{{description}}}
-
-Return the generated voice as audio data in PCM format.`,
-});
-
 const generateSyntheticVoiceFlow = ai.defineFlow(
   {
     name: 'generateSyntheticVoiceFlow',
@@ -62,13 +46,8 @@ const generateSyntheticVoiceFlow = ai.defineFlow(
       model: 'googleai/gemini-2.5-flash-preview-tts',
       config: {
         responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: {voiceName: 'Algenib'},
-          },
-        },
       },
-      prompt: input.description,
+      prompt: `Please say the following in Hindi: ${input.dialogue}`,
     });
     if (!media) {
       throw new Error('no media returned');
