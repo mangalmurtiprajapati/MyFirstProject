@@ -47,7 +47,7 @@ const generateSyntheticVoiceFlow = ai.defineFlow(
       config: {
         responseModalities: ['AUDIO'],
       },
-      prompt: `Please say the following in Hindi: ${input.dialogue}`,
+      prompt: input.dialogue,
     });
     if (!media) {
       throw new Error('no media returned');
