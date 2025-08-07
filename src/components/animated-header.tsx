@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from 'react'
@@ -7,6 +8,7 @@ import { SidebarTrigger, useSidebar } from './ui/sidebar';
 import { VocalForgeLogo } from './vocal-forge-logo';
 import { Button } from './ui/button';
 import { User } from 'lucide-react';
+import Link from 'next/link';
 
 export function AnimatedHeader() {
   const { toggleSidebar } = useSidebar();
@@ -46,9 +48,11 @@ export function AnimatedHeader() {
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-            <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-                <span className="sr-only">Profile</span>
+            <Button variant="ghost" size="icon" asChild>
+                <Link href="/profile">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">Profile</span>
+                </Link>
             </Button>
         </div>
       </div>
