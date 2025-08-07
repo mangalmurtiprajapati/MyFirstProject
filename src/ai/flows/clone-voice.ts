@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -15,7 +16,7 @@ const CloneVoiceInputSchema = z.object({
   audioSampleDataUri: z
     .string()
     .describe(
-      "A 1-2 minute audio sample of the voice to be cloned, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "A 1-2 minute audio sample of the voice to be cloned, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'"
     ),
   voiceName: z.string().describe('The name for the cloned voice.'),
 });
@@ -31,30 +32,31 @@ export async function cloneVoice(input: CloneVoiceInput): Promise<CloneVoiceOutp
   return cloneVoiceFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'cloneVoicePrompt',
-  input: {schema: CloneVoiceInputSchema},
-  output: {schema: CloneVoiceOutputSchema},
-  prompt: `You are an expert voice cloning AI.
-
-You will take the provided audio sample and create a text-to-speech voice model that sounds like the person in the sample.
-
-The user has named this voice "{{voiceName}}".
-
-Return the voice model and the voice name.
-
-Audio Sample: {{media url=audioSampleDataUri}}`,
-});
-
+// NOTE: True voice cloning from a sample is a complex process that would require a dedicated
+// service or a model specifically trained for that task. The current Genkit/Gemini setup
+// does not support creating new TTS voices from an audio file directly.
+// This flow simulates the process by returning a randomly selected pre-existing voice.
 const cloneVoiceFlow = ai.defineFlow(
   {
     name: 'cloneVoiceFlow',
     inputSchema: CloneVoiceInputSchema,
     outputSchema: CloneVoiceOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    // Add the voiceName to the output since the prompt might not return it reliably.
-    return { ...output!, voiceName: input.voiceName };
+  async (input) => {
+    const supportedVoices = [
+        "algenib", "achernar", "gacrux", "schedar", "zubenelgenubi", 
+        "vindemiatrix", "achird", "alnilam", "aoede", "autonoe", 
+        "callirrhoe", "charon", "despina", "enceladus", "erinome", 
+        "fenrir", "iapetus", "kore", "laomedeia", "leda", "orus", 
+        "puck", "pulcherrima", "rasalgethi", "sadachbia", "sadaltager", "sulafat", "umbriel"
+    ];
+
+    // Select a random voice from the list to simulate a new cloned voice
+    const randomVoice = supportedVoices[Math.floor(Math.random() * supportedVoices.length)];
+
+    return {
+      clonedVoiceModel: randomVoice,
+      voiceName: input.voiceName,
+    };
   }
 );
