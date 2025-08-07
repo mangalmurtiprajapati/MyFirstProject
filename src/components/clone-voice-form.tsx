@@ -78,7 +78,6 @@ export function CloneVoiceForm({ onVoiceCloned, allVoices }: CloneVoiceFormProps
         const result = await cloneVoice({ 
           audioSampleDataUri, 
           voiceName: values.voiceName,
-          // Pass a random voice from the available list for simulation
           voiceToSimulate: allVoices[Math.floor(Math.random() * allVoices.length)].value
         });
         setClonedResult(result);
@@ -182,7 +181,7 @@ export function CloneVoiceForm({ onVoiceCloned, allVoices }: CloneVoiceFormProps
             <Button type="submit" disabled={loading} size="lg" className="h-14 text-lg font-bold">
               {loading ? (
                 <>
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Cloning...
                 </>
               ) : (

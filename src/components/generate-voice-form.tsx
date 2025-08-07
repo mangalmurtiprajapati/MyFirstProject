@@ -34,6 +34,7 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
   const { toast } = useToast();
 
   useEffect(() => {
+    // If a new voice is added (cloned), select it automatically.
     if (voices.length > 0 && !voices.find(v => v.value === voice)) {
       setVoice(voices[voices.length-1].value);
     }
@@ -132,12 +133,12 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
         <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice} size="lg" className="h-14 text-lg font-bold">
           {loading ? (
             <>
-              <Loader2 className="animate-spin" />
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               Generating...
             </>
           ) : (
             <>
-              <Bot />
+              <Bot className="mr-2 h-5 w-5" />
               Generate Voice
             </>
           )}
@@ -156,7 +157,7 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
                 </audio>
                 <Button asChild variant="outline" className="w-full h-11 text-base font-semibold">
                     <a href={audioUrl} download="vocalforge_voice.wav">
-                        <Download />
+                        <Download className="mr-2 h-5 w-5" />
                         Download Now
                     </a>
                 </Button>
