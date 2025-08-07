@@ -28,17 +28,41 @@ export default function Home() {
   return (
     <div className="flex min-h-screen w-full flex-col items-center bg-background">
       <header className="sticky top-0 z-10 w-full bg-background/95 backdrop-blur-sm">
-        <div className="container mx-auto flex flex-col items-center gap-4 p-4 text-center sm:p-6 lg:p-8">
-          <VocalForgeLogo className="h-20 w-20 text-primary" />
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl font-headline">
+        <div className="container mx-auto flex h-20 items-center justify-center gap-4 text-center">
+          <VocalForgeLogo className="h-12 w-12 text-primary" />
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl font-headline">
             VocalForge
           </h1>
-          <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            Craft the perfect voice. Clone an existing one or generate a unique synthetic voice with AI.
-          </p>
+        </div>
+        <div className="relative">
+            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-border/50" />
+            </div>
+            <div className="relative flex justify-center">
+                <span className="bg-background px-2 text-primary">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-5 w-5"
+                    >
+                        <path d="M3 21h18" />
+                        <path d="M7 12v2" />
+                        <path d="M12 10v4" />
+                        <path d="M17 14v-2" />
+                        <path d="M3 3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3" />
+                    </svg>
+                </span>
+            </div>
         </div>
       </header>
-      <main className="container mx-auto w-full max-w-4xl p-4 sm:p-6 lg:p-8 pt-0">
+      <main className="container mx-auto w-full max-w-4xl p-4 sm:p-6 lg:p-8 pt-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="generate">Generate Voice</TabsTrigger>

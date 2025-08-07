@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Clipboard, Check, Sparkles } from "lucide-react";
+import { Loader2, Upload, Clipboard, Check, Sparkles, Music4 } from "lucide-react";
 import type { Voice } from "./generate-voice-form";
 
 const formSchema = z.object({
@@ -28,6 +28,7 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
   const [loading, setLoading] = useState(false);
   const [clonedResult, setClonedResult] = useState<CloneVoiceOutput | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -37,6 +38,20 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
       audioFile: undefined,
     },
   });
+
+  const audioFile = form.watch("audioFile");
+
+  useEffect(() => {
+    if (audioFile) {
+        const url = URL.createObjectURL(audioFile);
+        setPreviewUrl(url);
+
+        return () => {
+            URL.revokeObjectURL(url);
+            setPreviewUrl(null);
+        };
+    }
+  }, [audioFile]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
@@ -137,6 +152,14 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
                 </FormItem>
               )}
             />
+            {previewUrl && (
+                <div className="space-y-2 pt-2">
+                    <Label>Audio Preview</Label>
+                    <audio controls src={previewUrl} className="w-full">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            )}
           </CardContent>
           <CardFooter className="flex-col items-stretch gap-4">
             <Button type="submit" disabled={loading}>
@@ -164,7 +187,7 @@ export function CloneVoiceForm({ onVoiceCloned }: CloneVoiceFormProps) {
                 <div className="space-y-2 mb-4">
                     <p className="font-semibold text-lg">{clonedResult.voiceName}</p>
                     <p className="text-muted-foreground text-sm">
-                      Use this model ID with text-to-speech APIs for your projects.
+                      This voice is now available in the 'Generate Voice' tab.
                     </p>
                 </div>
                 
