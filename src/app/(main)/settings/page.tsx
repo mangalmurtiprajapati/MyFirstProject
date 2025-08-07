@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/hooks/use-toast"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 
@@ -39,22 +39,47 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-const defaultValues: Partial<ProfileFormValues> = {
-  username: "YourName",
-  email: "contact@yourdomain.com",
+const defaultProfileValues: Partial<ProfileFormValues> = {
+  username: "Alex Doe",
+  email: "alex.doe@example.com",
 }
 
+const notificationsFormSchema = z.object({
+    emailNotifications: z.boolean().default(false).optional(),
+    pushNotifications: z.boolean().default(false).optional(),
+})
+
+type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
+
+const defaultNotificationValues: Partial<NotificationsFormValues> = {
+    emailNotifications: true,
+    pushNotifications: false,
+}
+
+
 export default function SettingsPage() {
-  const form = useForm<ProfileFormValues>({
+  const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
+    defaultValues: defaultProfileValues,
     mode: "onChange",
   })
 
-  function onSubmit(data: ProfileFormValues) {
+  const notificationsForm = useForm<NotificationsFormValues>({
+      resolver: zodResolver(notificationsFormSchema),
+      defaultValues: defaultNotificationValues,
+  })
+
+  function onProfileSubmit(data: ProfileFormValues) {
     toast({
       title: "Profile updated!",
       description: "Your new profile information has been saved.",
+    })
+  }
+
+  function onNotificationsSubmit(data: NotificationsFormValues) {
+    toast({
+        title: "Notification settings updated!",
+        description: "Your preferences have been saved.",
     })
   }
 
@@ -69,93 +94,112 @@ export default function SettingsPage() {
       <Separator />
       <div className="space-y-6">
         <Card>
-            <CardHeader>
-                <CardTitle>Profile</CardTitle>
-                <CardDescription>Update your personal information.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <FormField
-                        control={form.control}
-                        name="username"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                            <Input placeholder="Your username" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                            This is your public display name.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                            <Input type="email" placeholder="Your email" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                We will never share your email with anyone else.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <Button type="submit">Update profile</Button>
-                    </form>
-                </Form>
-            </CardContent>
+            <Form {...profileForm}>
+                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+                    <CardHeader>
+                        <CardTitle>Profile</CardTitle>
+                        <CardDescription>Update your personal information.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-8">
+                        <FormField
+                            control={profileForm.control}
+                            name="username"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Username</FormLabel>
+                                <FormControl>
+                                <Input placeholder="Your username" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                This is your public display name.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={profileForm.control}
+                            name="email"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                <Input type="email" placeholder="Your email" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    We will never share your email with anyone else.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </CardContent>
+                    <CardFooter>
+                        <Button type="submit">Update profile</Button>
+                    </CardFooter>
+                </form>
+            </Form>
         </Card>
         
         <Card>
-            <CardHeader>
-                <CardTitle>Notifications</CardTitle>
-                <CardDescription>Manage your notification preferences.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                        Email Notifications
-                        </FormLabel>
-                        <FormDescription>
-                        Receive emails about new features, and updates.
-                        </FormDescription>
-                    </div>
-                    <FormControl>
-                        <Switch
-                        // This would be controlled by state
-                        // checked={field.value}
-                        // onCheckedChange={field.onChange}
+            <Form {...notificationsForm}>
+                 <form onSubmit={notificationsForm.handleSubmit(onNotificationsSubmit)}>
+                    <CardHeader>
+                        <CardTitle>Notifications</CardTitle>
+                        <CardDescription>Manage your notification preferences.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <FormField
+                            control={notificationsForm.control}
+                            name="emailNotifications"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                    <div className="space-y-0.5">
+                                        <FormLabel className="text-base">
+                                        Email Notifications
+                                        </FormLabel>
+                                        <FormDescription>
+                                        Receive emails about new features, and updates.
+                                        </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
                         />
-                    </FormControl>
-                </div>
-                 <div className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                        Push Notifications
-                        </FormLabel>
-                        <FormDescription>
-                        Receive push notifications on your devices.
-                        </FormDescription>
-                    </div>
-                    <FormControl>
-                        <Switch
-                         // This would be controlled by state
-                        // checked={field.value}
-                        // onCheckedChange={field.onChange}
-                        disabled
+                        <FormField
+                            control={notificationsForm.control}
+                            name="pushNotifications"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                    <div className="space-y-0.5">
+                                        <FormLabel className="text-base">
+                                        Push Notifications
+                                        </FormLabel>
+                                        <FormDescription>
+                                        Receive push notifications on your devices.
+                                        </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                            disabled
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
                         />
-                    </FormControl>
-                </div>
-            </CardContent>
+                    </CardContent>
+                    <CardFooter>
+                        <Button type="submit">Update notifications</Button>
+                    </CardFooter>
+                 </form>
+            </Form>
         </Card>
       </div>
     </div>
