@@ -4,6 +4,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { useTheme } from "next-themes"
+import { Monitor, Moon, Sun } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -58,6 +60,8 @@ const defaultNotificationValues: Partial<NotificationsFormValues> = {
 
 
 export default function SettingsPage() {
+  const { setTheme } = useTheme()
+
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: defaultProfileValues,
@@ -200,6 +204,24 @@ export default function SettingsPage() {
                     </CardFooter>
                  </form>
             </Form>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>Theme</CardTitle>
+                <CardDescription>Select a theme for the application.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex gap-4">
+                 <Button variant="outline" onClick={() => setTheme("light")} className="flex-1">
+                    <Sun className="mr-2" /> Light
+                </Button>
+                <Button variant="outline" onClick={() => setTheme("dark")} className="flex-1">
+                    <Moon className="mr-2" /> Dark
+                </Button>
+                <Button variant="outline" onClick={() => setTheme("system")} className="flex-1">
+                    <Monitor className="mr-2" /> System
+                </Button>
+            </CardContent>
         </Card>
       </div>
     </div>
