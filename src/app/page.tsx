@@ -59,7 +59,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen w-full flex-col items-center bg-background bg-grid-white/[0.05] relative">
        <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
-      <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-10 w-full bg-background/95 backdrop-blur-sm">
         <div className="container mx-auto flex h-20 items-center justify-center gap-4 text-center">
           <VocalForgeLogo className="h-10 w-10 text-primary" />
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl font-headline">

@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Bot, Download, Mic, User, SparklesIcon } from "lucide-react";
+import { Loader2, Bot, Download, Mic, User, SparklesIcon, Music4 } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from './ui/select';
 
 export interface Voice {
@@ -143,16 +143,21 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
           )}
         </Button>
         {audioUrl && (
-          <div className="mt-4 flex flex-col gap-4 animate-in fade-in-50">
-             <div className="rounded-lg border bg-muted/50 p-4 space-y-4">
-                <h3 className="font-semibold text-lg">Your Generated Voice</h3>
-                <audio controls src={audioUrl} className="w-full">
+          <div className="mt-4 animate-in fade-in-50">
+             <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-background to-secondary/30 p-4 space-y-4 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-full border border-primary/20">
+                     <Music4 className="text-primary h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-xl text-foreground">Voice Generated</h3>
+                </div>
+                <audio controls src={audioUrl} className="w-full rounded-lg">
                     Your browser does not support the audio element.
                 </audio>
-                <Button asChild variant="outline">
+                <Button asChild variant="outline" className="w-full h-11 text-base font-semibold">
                     <a href={audioUrl} download="vocalforge_voice.wav">
                         <Download />
-                        Download .wav
+                        Download Now
                     </a>
                 </Button>
              </div>
