@@ -25,14 +25,14 @@ export function HistoryCard({ item }: HistoryCardProps) {
         <CardTitle className="truncate text-lg font-bold" title={item.dialogue}>
           "{item.dialogue}"
         </CardTitle>
-        <CardDescription className="flex items-center gap-4 pt-2 text-sm">
+        <CardDescription className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-sm">
           <span className="flex items-center gap-2">
             <Mic className="h-4 w-4" />
             {item.voice}
           </span>
           <span className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            {format(item.timestamp, "PPP p")}
+            {format(new Date(item.timestamp), "PPP p")}
           </span>
         </CardDescription>
       </CardHeader>
@@ -46,7 +46,7 @@ export function HistoryCard({ item }: HistoryCardProps) {
           <Star className={cn("h-5 w-5", item.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground")} />
         </Button>
         <Button variant="ghost" size="icon" asChild title="Download audio">
-          <a href={item.audioUrl} download={`${item.voice}-${item.id}.wav`}>
+          <a href={item.audioUrl} download={`${item.voice.replace(' ','_')}-${item.id}.wav`}>
             <Download className="h-5 w-5 text-muted-foreground" />
           </a>
         </Button>

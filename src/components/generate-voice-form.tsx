@@ -62,7 +62,7 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
         dialogue,
         voice: voices.find(v => v.value === voice)?.label || voice,
         audioUrl: result.audioDataUri,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         isFavorite: false,
       };
 

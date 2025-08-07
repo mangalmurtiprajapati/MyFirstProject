@@ -2,10 +2,7 @@
 "use client"
 
 import { usePathname } from 'next/navigation';
-import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
-import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger } from "./ui/sidebar";
+import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator } from "./ui/sidebar";
 import { VocalForgeLogo } from "./vocal-forge-logo";
 import { AnimatedHeader } from './animated-header';
 import { Home, Settings, Mic, History, Star, User } from 'lucide-react';
@@ -30,37 +27,36 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         <>
             <Sidebar>
                 <SidebarHeader>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                         <VocalForgeLogo className="h-8 w-8 text-primary" />
-                        <span className="text-lg font-semibold">VocalForge</span>
+                        <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">VocalForge</span>
                     </div>
                 </SidebarHeader>
-                <ScrollArea className="flex-1">
-                    <SidebarContent>
-                        <SidebarMenu>
-                            {navItems.map((item) => (
-                                <SidebarMenuItem key={item.href}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        isActive={pathname === item.href}
-                                        className="justify-start"
-                                        tooltip={{
-                                            children: item.label,
-                                            side: "right",
-                                            align: "center",
-                                        }}
-                                    >
-                                        <a href={item.href}>
-                                            <item.icon className="size-5" />
-                                            <span>{item.label}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarContent>
-                </ScrollArea>
-                 <SidebarContent>
+                <SidebarContent className="p-2">
+                    <SidebarMenu>
+                        {navItems.map((item) => (
+                            <SidebarMenuItem key={item.href}>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={pathname === item.href}
+                                    className="justify-start"
+                                    tooltip={{
+                                        children: item.label,
+                                        side: "right",
+                                        align: "center",
+                                    }}
+                                >
+                                    <a href={item.href}>
+                                        <item.icon className="size-5" />
+                                        <span>{item.label}</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </SidebarContent>
+                 <SidebarContent className="p-2 mt-auto">
+                    <SidebarSeparator className="my-1" />
                     <SidebarMenu>
                         {bottomNavItems.map((item) => (
                              <SidebarMenuItem key={item.href}>
