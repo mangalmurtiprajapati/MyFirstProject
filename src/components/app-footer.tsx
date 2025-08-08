@@ -1,4 +1,5 @@
 
+import Link from "next/link";
 import { VocalForgeLogo } from "./vocal-forge-logo";
 
 export function AppFooter() {
@@ -12,12 +13,12 @@ export function AppFooter() {
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                    <Link href="/terms" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                         Terms of Service
-                    </a>
-                    <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                    </Link>
+                    <Link href="/privacy" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                         Privacy Policy
-                    </a>
+                    </Link>
                 </div>
             </div>
         </footer>

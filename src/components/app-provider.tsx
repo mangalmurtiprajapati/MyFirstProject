@@ -3,7 +3,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { SidebarProvider } from './ui/sidebar';
-import { MainLayout } from './main-layout';
 import { isToday } from 'date-fns';
 
 export interface HistoryItem {
@@ -123,9 +122,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return (
         <AppContext.Provider value={{ history, setHistory, favorites, toggleFavorite, profile, setProfile, stats, creditState }}>
             <SidebarProvider defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
-                <MainLayout>
-                    {children}
-                </MainLayout>
+                {children}
             </SidebarProvider>
         </AppContext.Provider>
     );

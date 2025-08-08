@@ -23,6 +23,29 @@ const bottomNavItems = [
 export function MainLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
 
+    const isLegalPage = pathname === '/terms' || pathname === '/privacy';
+
+    const mainContent = (
+         <div className="flex flex-col flex-1">
+            {!isLegalPage && <AnimatedHeader />}
+            <main className="flex-1">
+                {children}
+            </main>
+            <AppFooter />
+        </div>
+    )
+
+    if (isLegalPage) {
+        return (
+            <div className="flex flex-col flex-1">
+                <main className="flex-1">
+                    {children}
+                </main>
+                <AppFooter />
+            </div>
+        )
+    }
+
     return (
         <>
             <Sidebar>
@@ -81,13 +104,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                 </SidebarContent>
             </Sidebar>
 
-            <div className="flex flex-col flex-1">
-                <AnimatedHeader />
-                <main className="flex-1">
-                    {children}
-                </main>
-                <AppFooter />
-            </div>
+           {mainContent}
         </>
     );
 }
