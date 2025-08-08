@@ -8,9 +8,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Bot, Download, Mic, User, SparklesIcon, Music4 } from "lucide-react";
+import { Loader2, Bot, Download, Mic, User, SparklesIcon, Music4, Star } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from './ui/select';
 import { useAppContext, HistoryItem } from './app-provider';
+import { cn } from '@/lib/utils';
 
 export interface Voice {
     value: string;
@@ -27,9 +28,9 @@ interface GenerateVoiceFormProps {
 }
 
 export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceFormProps) {
-  const { setHistory } = useAppContext();
+  const { setHistory, toggleFavorite, creditState } = useAppContext();
   const [loading, setLoading] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [generatedItem, setGeneratedItem] = useState<HistoryItem | null>(null);
   const [dialogue, setDialogue] = useState("");
   const [voice, setVoice] = useState(voices.length > 0 ? voiceCategories.male[0].value : "");
   
@@ -43,6 +44,16 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     }
   }, [voices, voice]);
 
+  useEffect(() => {
+    // When the history updates (e.g. favorite status changes), update the local generated item
+    if (generatedItem) {
+        const historyItem = history.find(h => h.id === generatedItem.id);
+        if(historyItem) {
+            setGeneratedItem(historyItem);
+        }
+    }
+  }, [history]);
+
   const handleGenerate = async () => {
     if (!dialogue) {
       toast({
@@ -52,10 +63,9 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
       return;
     }
     setLoading(true);
-    setAudioUrl(null);
+    setGeneratedItem(null);
     try {
       const result = await generateSyntheticVoice({ dialogue, voice });
-      setAudioUrl(result.audioDataUri);
 
       const newHistoryItem: HistoryItem = {
         id: new Date().toISOString(),
@@ -67,6 +77,7 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
       };
 
       setHistory(prev => [newHistoryItem, ...prev]);
+      setGeneratedItem(newHistoryItem);
 
       toast({
         title: "Voice Generated!",
@@ -155,7 +166,7 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
         </div>
       </CardContent>
       <CardFooter className="flex-col items-stretch gap-4 p-6">
-        <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice} size="lg" className="h-14 text-lg font-bold">
+        <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice || creditState.limitReached} size="lg" className="h-14 text-lg font-bold">
           {loading ? (
             <>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -168,20 +179,25 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
             </>
           )}
         </Button>
-        {audioUrl && (
+        {generatedItem && (
           <div className="mt-4 animate-in fade-in-50">
              <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-background to-secondary/30 p-4 space-y-4 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-full border border-primary/20">
-                     <Music4 className="text-primary h-5 w-5" />
-                  </div>
-                  <h3 className="font-bold text-xl text-foreground">Voice Generated</h3>
+                <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-full border border-primary/20">
+                            <Music4 className="text-primary h-5 w-5" />
+                        </div>
+                        <h3 className="font-bold text-xl text-foreground">Voice Generated</h3>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => toggleFavorite(generatedItem.id)} title={generatedItem.isFavorite ? "Remove from favorites" : "Add to favorites"}>
+                        <Star className={cn("h-6 w-6 transition-all", generatedItem.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground hover:text-yellow-400")} />
+                    </Button>
                 </div>
-                <audio controls src={audioUrl} className="w-full rounded-lg">
+                <audio controls src={generatedItem.audioUrl} className="w-full rounded-lg">
                     Your browser does not support the audio element.
                 </audio>
                 <Button asChild variant="outline" className="w-full h-11 text-base font-semibold">
-                    <a href={audioUrl} download="vocalforge_voice.wav">
+                    <a href={generatedItem.audioUrl} download="vocalforge_voice.wav">
                         <Download className="mr-2 h-5 w-5" />
                         Download Now
                     </a>

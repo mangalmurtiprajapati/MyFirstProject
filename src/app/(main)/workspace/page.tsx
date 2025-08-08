@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GenerateVoiceForm, Voice } from "@/components/generate-voice-form";
 import { CloneVoiceForm } from "@/components/clone-voice-form";
 import { motion } from "framer-motion";
+import { CreditUsageCard } from "@/components/credit-usage-card";
 
 const maleVoices: Voice[] = [
   { value: "algenib", label: "Deep Male" },
@@ -56,7 +57,8 @@ export default function WorkspacePage() {
   };
 
   return (
-    <div className="flex w-full flex-col items-center">
+    <div className="flex w-full flex-col items-center gap-8">
+        <CreditUsageCard />
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

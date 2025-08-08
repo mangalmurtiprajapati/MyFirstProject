@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { SidebarProvider } from './ui/sidebar';
 import { MainLayout } from './main-layout';
+import { isToday } from 'date-fns';
 
 export interface HistoryItem {
   id: string;
@@ -33,7 +34,14 @@ interface AppContextType {
     voicesGenerated: number;
     favoritesCount: number;
     historyItems: number;
+    generationsToday: number;
   };
+  creditState: {
+    dailyLimit: number;
+    creditsUsed: number;
+    creditsRemaining: number;
+    limitReached: boolean;
+  }
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -68,6 +76,8 @@ const defaultProfile: UserProfile = {
     bio: "AI enthusiast and sound designer, exploring the future of voice synthesis with VocalForge."
 };
 
+const DAILY_GENERATION_LIMIT = 15;
+
 export function AppProvider({ children }: { children: ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [history, setHistory] = useState<HistoryItem[]>(() => getFromLocalStorage('appHistory', []));
@@ -94,14 +104,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     const favorites = history.filter(item => item.isFavorite);
 
+    const generationsToday = history.filter(item => isToday(new Date(item.timestamp))).length;
+
     const stats = {
         voicesGenerated: history.length,
         favoritesCount: favorites.length,
         historyItems: history.length,
+        generationsToday: generationsToday,
+    };
+
+    const creditState = {
+        dailyLimit: DAILY_GENERATION_LIMIT,
+        creditsUsed: generationsToday,
+        creditsRemaining: DAILY_GENERATION_LIMIT - generationsToday,
+        limitReached: generationsToday >= DAILY_GENERATION_LIMIT,
     };
 
     return (
-        <AppContext.Provider value={{ history, setHistory, favorites, toggleFavorite, profile, setProfile, stats }}>
+        <AppContext.Provider value={{ history, setHistory, favorites, toggleFavorite, profile, setProfile, stats, creditState }}>
             <SidebarProvider defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
                 <MainLayout>
                     {children}
