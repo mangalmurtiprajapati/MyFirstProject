@@ -20,7 +20,7 @@ export default function HomePage() {
             </Link>
           </Button>
           <Button asChild variant="link" size="lg">
-            <a href="#">Learn more <span aria-hidden="true">→</span></a>
+            <Link href="/learn-more">Learn more <span aria-hidden="true">→</span></Link>
           </Button>
         </div>
       </div>
