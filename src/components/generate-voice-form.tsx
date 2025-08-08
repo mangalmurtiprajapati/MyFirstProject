@@ -28,7 +28,7 @@ interface GenerateVoiceFormProps {
 }
 
 export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceFormProps) {
-  const { setHistory, toggleFavorite, creditState } = useAppContext();
+  const { history, setHistory, toggleFavorite, creditState } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [generatedItem, setGeneratedItem] = useState<HistoryItem | null>(null);
   const [dialogue, setDialogue] = useState("");
@@ -52,7 +52,7 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
             setGeneratedItem(historyItem);
         }
     }
-  }, [history]);
+  }, [history, generatedItem]);
 
   const handleGenerate = async () => {
     if (!dialogue) {
