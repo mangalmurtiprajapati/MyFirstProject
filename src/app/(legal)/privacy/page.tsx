@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
@@ -7,6 +8,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export default function PrivacyPolicyPage() {
+  const [date, setDate] = useState('');
+
+  useEffect(() => {
+    setDate(new Date().toLocaleDateString());
+  }, []);
+
   return (
     <div className="space-y-8">
         <Button asChild variant="outline">
@@ -18,7 +25,7 @@ export default function PrivacyPolicyPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-3xl font-bold">Privacy Policy</CardTitle>
-          <CardDescription>Last Updated: {new Date().toLocaleDateString()}</CardDescription>
+          <CardDescription>Last Updated: {date}</CardDescription>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[60vh] pr-6">
