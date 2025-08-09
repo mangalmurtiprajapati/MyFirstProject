@@ -32,7 +32,7 @@ export default function ProfilePage() {
             <div className="grid gap-8 md:grid-cols-3">
                 <div className="md:col-span-1">
                     <Card>
-                        <CardHeader className="items-center text-center">
+                        <CardHeader className="items-center text-center p-4 md:p-6">
                             <Avatar className="w-24 h-24 mb-4" data-ai-hint="profile picture">
                                 <AvatarImage src={profile.avatar} alt={profile.name} />
                                 <AvatarFallback>{profile.initials}</AvatarFallback>
@@ -40,10 +40,10 @@ export default function ProfilePage() {
                             <CardTitle>{profile.name}</CardTitle>
                             <CardDescription>{profile.email}</CardDescription>
                         </CardHeader>
-                        <CardContent className="text-center">
+                        <CardContent className="text-center px-4 md:px-6">
                             <p className="text-sm text-muted-foreground">{profile.bio}</p>
                         </CardContent>
-                        <CardFooter>
+                        <CardFooter className="px-4 pb-4 md:px-6 md:pb-6">
                             <Button variant="outline" className="w-full" onClick={() => setIsSheetOpen(true)}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit Profile
@@ -59,8 +59,8 @@ export default function ProfilePage() {
                         </CardHeader>
                         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {statItems.map((stat, index) => (
-                                <Card key={index} className="flex flex-col items-center justify-center p-6 text-center bg-muted/50">
-                                    <stat.icon className="w-10 h-10 mb-2 text-primary" />
+                                <Card key={index} className="flex flex-col items-center justify-center p-4 md:p-6 text-center bg-muted/50">
+                                    <stat.icon className="w-8 h-8 md:w-10 md:h-10 mb-2 text-primary" />
                                     <p className="text-2xl font-bold">{stat.value}</p>
                                     <p className="text-sm text-muted-foreground">{stat.label}</p>
                                 </Card>

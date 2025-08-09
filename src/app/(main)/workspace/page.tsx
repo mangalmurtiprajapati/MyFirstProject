@@ -11,7 +11,7 @@ import { useAppContext } from "@/components/app-provider";
 import { HistoryCard } from "@/components/history-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { History } from "lucide-react";
+import { History, LayoutGrid } from "lucide-react";
 
 const maleVoices: Voice[] = [
   { value: "algenib", label: "Deep Male" },
@@ -62,7 +62,7 @@ export default function WorkspacePage() {
     setActiveTab("generate");
   };
   
-  const recentHistory = history.slice(0, 5);
+  const recentHistory = history.slice(0, 3);
 
   return (
     <div className="flex w-full flex-col items-center gap-8">
@@ -90,14 +90,14 @@ export default function WorkspacePage() {
         {recentHistory.length > 0 && (
             <div className="w-full max-w-4xl mt-8">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold">Recent History</h2>
+                    <h2 className="text-2xl font-bold flex items-center gap-2"><History className="h-6 w-6"/>Recent History</h2>
                     <Button variant="link" asChild>
                         <Link href="/history">
-                            View All <History className="ml-2 h-4 w-4" />
+                            View All <LayoutGrid className="ml-2 h-4 w-4" />
                         </Link>
                     </Button>
                 </div>
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4">
                     {recentHistory.map((item) => (
                         <HistoryCard key={item.id} item={item} />
                     ))}

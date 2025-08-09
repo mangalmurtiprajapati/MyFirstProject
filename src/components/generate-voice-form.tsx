@@ -43,29 +43,17 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     }
   }, [voices, voice]);
 
-  // This effect ensures that if the history array changes (e.g., an item is favorited from another component),
-  // the `generatedItem` state is updated to reflect that change.
   useEffect(() => {
     if (generatedItem) {
         const updatedItem = history.find(h => h.id === generatedItem.id);
         if (updatedItem) {
             setGeneratedItem(updatedItem);
         } else {
-            // The item was deleted from history
             setGeneratedItem(null);
         }
     }
   }, [history, generatedItem]);
-
-  const findNewestItem = useCallback((prevHistory: HistoryItem[], newHistory: HistoryItem[]) => {
-      // Logic to find the newest item that was just added
-      if (newHistory.length > prevHistory.length) {
-          const newItems = newHistory.filter(newItem => !prevHistory.some(oldItem => oldItem.id === newItem.id));
-          return newItems[0] || null; // Return the first new item found
-      }
-      return null;
-  }, []);
-
+  
   const handleGenerate = async () => {
     if (!dialogue) {
       toast({
@@ -77,8 +65,6 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     setLoading(true);
     setGeneratedItem(null);
     
-    const currentHistory = history;
-
     try {
       const result = await generateSyntheticVoice({ dialogue, voice });
 
@@ -88,7 +74,6 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
         audioUrl: result.audioDataUri,
       };
       
-      // Add item to global history. This is now an async update.
       addHistoryItem(newItemData);
 
       toast({
@@ -117,19 +102,14 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     }
   };
 
-  // This effect listens for changes in history after a generation and sets the generated item.
   useEffect(() => {
-    if (history.length > 0 && loading === false) {
-      // After loading stops, check if the first item in history is newer than what's displayed.
-      // This is a simplified way to get the latest generated item.
-      if (!generatedItem || generatedItem.id !== history[0].id) {
-          // Check if the dialogue matches to ensure we're showing the correct result
-          if (history[0].dialogue === dialogue) {
-              setGeneratedItem(history[0]);
-          }
+    if (!loading && history.length > 0) {
+      const latestItem = history[0];
+      if (latestItem.dialogue === dialogue) {
+        setGeneratedItem(latestItem);
       }
     }
-  }, [history, loading, dialogue, generatedItem]);
+  }, [history, loading, dialogue]);
   
   return (
     <Card className="w-full shadow-xl border-border/60 bg-card/80 backdrop-blur-sm">
@@ -209,11 +189,11 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
           <div className="mt-4 animate-in fade-in-50">
              <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-background to-secondary/30 p-4 space-y-4 shadow-lg">
                 <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-full border border-primary/20">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="p-2 bg-primary/10 rounded-full border border-primary/20 flex-shrink-0">
                             <Music4 className="text-primary h-5 w-5" />
                         </div>
-                        <h3 className="font-bold text-xl text-foreground">Voice Generated</h3>
+                        <h3 className="font-bold text-lg md:text-xl text-foreground truncate">Voice Generated</h3>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => toggleFavorite(generatedItem.id)} title={generatedItem.isFavorite ? "Remove from favorites" : "Add to favorites"}>
                         <Star className={cn("h-6 w-6 transition-all", generatedItem.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground hover:text-yellow-400")} />

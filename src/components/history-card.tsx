@@ -17,27 +17,27 @@ export function HistoryCard({ item }: HistoryCardProps) {
 
   return (
     <Card className="w-full shadow-lg border-border/60 bg-card/80 backdrop-blur-sm transition-all hover:shadow-xl flex flex-col">
-      <CardHeader className="flex-grow">
-        <CardTitle className="text-lg font-bold">
-          <p className="truncate" title={item.dialogue}>"{item.dialogue}"</p>
+      <CardHeader className="flex-grow pb-4">
+        <CardTitle className="text-lg font-bold leading-tight">
+          <p className="line-clamp-2" title={item.dialogue}>"{item.dialogue}"</p>
         </CardTitle>
-        <CardDescription className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pt-2 text-sm">
+        <CardDescription className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 pt-3 text-xs">
           <span className="flex items-center gap-2 truncate">
             <Mic className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">{item.voice}</span>
+            <span className="truncate" title={item.voice}>{item.voice}</span>
           </span>
           <span className="flex items-center gap-2 truncate">
             <Calendar className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">{format(new Date(item.timestamp), "PPP p")}</span>
+            <span className="truncate">{format(new Date(item.timestamp), "PPp")}</span>
           </span>
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <audio controls src={item.audioUrl} className="w-full rounded-lg">
+      <CardContent className="px-4 md:px-6">
+        <audio controls src={item.audioUrl} className="w-full rounded-lg h-10">
           Your browser does not support the audio element.
         </audio>
       </CardContent>
-      <CardFooter className="flex justify-end gap-2">
+      <CardFooter className="flex justify-end gap-1 p-2 md:p-3">
         <Button variant="ghost" size="icon" onClick={() => toggleFavorite(item.id)} title={item.isFavorite ? "Remove from favorites" : "Add to favorites"}>
           <Star className={cn("h-5 w-5 transition-colors", item.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground hover:text-yellow-400")} />
         </Button>

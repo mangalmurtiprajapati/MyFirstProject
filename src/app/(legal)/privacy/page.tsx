@@ -16,12 +16,14 @@ export default function PrivacyPolicyPage() {
 
   return (
     <div className="space-y-8">
-        <Button asChild variant="outline">
-            <Link href="/home">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
-            </Link>
-        </Button>
+        <div className="flex justify-start">
+            <Button asChild variant="outline">
+                <Link href="/home">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Home
+                </Link>
+            </Button>
+        </div>
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-3xl font-bold">Privacy Policy</CardTitle>

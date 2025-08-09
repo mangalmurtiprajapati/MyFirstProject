@@ -46,14 +46,14 @@ const aiTools = [
 export default function LearnMorePage() {
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">Explore More AI Possibilities</h1>
           <p className="text-muted-foreground">
             Beyond voice, I can build a wide range of AI-powered applications.
           </p>
         </div>
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" className="w-full sm:w-auto">
             <Link href="/home">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Home
