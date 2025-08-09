@@ -28,7 +28,7 @@ interface GenerateVoiceFormProps {
 }
 
 export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceFormProps) {
-  const { history, setHistory, toggleFavorite, creditState } = useAppContext();
+  const { history, addHistoryItem, toggleFavorite, creditState } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [generatedItem, setGeneratedItem] = useState<HistoryItem | null>(null);
   const [dialogue, setDialogue] = useState("");
@@ -67,17 +67,18 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     try {
       const result = await generateSyntheticVoice({ dialogue, voice });
 
-      const newHistoryItem: HistoryItem = {
-        id: new Date().toISOString(),
+      const newItemData = {
         dialogue,
         voice: voices.find(v => v.value === voice)?.label || voice,
         audioUrl: result.audioDataUri,
-        timestamp: new Date().toISOString(),
-        isFavorite: false,
       };
-
-      setHistory(prev => [newHistoryItem, ...prev]);
-      setGeneratedItem(newHistoryItem);
+      
+      addHistoryItem(newItemData);
+      
+      // Find the newly added item in the history to set it as the generated item
+      const newHistoryItem = history.find(h => h.dialogue === newItemData.dialogue && h.audioUrl === newItemData.audioUrl);
+      
+      setGeneratedItem(newHistoryItem || null);
 
       toast({
         title: "Voice Generated!",

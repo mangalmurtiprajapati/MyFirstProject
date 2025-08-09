@@ -13,11 +13,7 @@ interface HistoryCardProps {
 }
 
 export function HistoryCard({ item }: HistoryCardProps) {
-  const { toggleFavorite, setHistory } = useAppContext();
-
-  const handleDelete = () => {
-    setHistory(prev => prev.filter(h => h.id !== item.id));
-  };
+  const { toggleFavorite, deleteHistoryItem } = useAppContext();
 
   return (
     <Card className="w-full shadow-lg border-border/60 bg-card/80 backdrop-blur-sm transition-all hover:shadow-xl">
@@ -50,7 +46,7 @@ export function HistoryCard({ item }: HistoryCardProps) {
             <Download className="h-5 w-5 text-muted-foreground" />
           </a>
         </Button>
-         <Button variant="ghost" size="icon" onClick={handleDelete} title="Delete history item">
+         <Button variant="ghost" size="icon" onClick={() => deleteHistoryItem(item.id)} title="Delete history item">
             <Trash2 className="h-5 w-5 text-destructive/80" />
         </Button>
       </CardFooter>
