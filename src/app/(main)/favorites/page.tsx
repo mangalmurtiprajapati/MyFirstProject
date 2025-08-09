@@ -5,9 +5,29 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Star } from "lucide-react";
 import { useAppContext } from "@/components/app-provider";
 import { HistoryCard } from "@/components/history-card";
+import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FavoritesPage() {
   const { favorites } = useAppContext();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+        <div>
+            <h1 className="text-3xl font-bold mb-6">Favorite Voices</h1>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-64 w-full" />
+            </div>
+      </div>
+    );
+  }
 
   return (
     <div>
