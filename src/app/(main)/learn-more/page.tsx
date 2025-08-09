@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Bot, MessageSquare, BarChart, ImageIcon, BrainCircuit } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 const aiTools = [
   {
@@ -77,6 +78,7 @@ export default function LearnMorePage() {
                  <Image src={tool.image} alt={tool.title} fill className="object-cover" data-ai-hint={tool.hint} />
                </div>
               <CardDescription>{tool.description}</CardDescription>
+              <Badge variant="outline">Coming Soon</Badge>
             </CardContent>
           </Card>
         ))}
