@@ -24,13 +24,12 @@ export interface UserProfile {
 
 interface AppContextType {
   history: HistoryItem[];
-  setHistory: React.Dispatch<React.SetStateAction<HistoryItem[]>>;
   favorites: HistoryItem[];
   toggleFavorite: (id: string) => void;
   deleteHistoryItem: (id: string) => void;
   addHistoryItem: (item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => void;
   profile: UserProfile;
-  setProfile: React.Dispatch<React.SetStateAction<UserProfile>>;
+  setProfile: (newProfile: UserProfile) => void;
   stats: {
     voicesGenerated: number;
     favoritesCount: number;
@@ -81,49 +80,50 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [isMounted, setIsMounted] = useState(false);
     
-    // State is initialized directly from localStorage
-    const [history, setHistory] = useState<HistoryItem[]>(() => getFromLocalStorage('appHistory', []));
-    const [profile, setProfile] = useState<UserProfile>(() => getFromLocalStorage('userProfile', defaultProfile));
+    const [history, setHistory] = useState<HistoryItem[]>([]);
+    const [profile, setProfileState] = useState<UserProfile>(defaultProfile);
 
-    // Effect to persist history changes to localStorage
     useEffect(() => {
-        if (isMounted) {
-            setInLocalStorage('appHistory', history);
-        }
-    }, [history, isMounted]);
-
-    // Effect to persist profile changes to localStorage
-    useEffect(() => {
-        if (isMounted) {
-            setInLocalStorage('userProfile', profile);
-        }
-    }, [profile, isMounted]);
-
-    // Mark as mounted after the initial render
-    useEffect(() => {
+        setHistory(getFromLocalStorage('appHistory', []));
+        setProfileState(getFromLocalStorage('userProfile', defaultProfile));
         setIsMounted(true);
     }, []);
 
+    const setProfile = useCallback((newProfile: UserProfile) => {
+        setProfileState(newProfile);
+        setInLocalStorage('userProfile', newProfile);
+    }, []);
+
     const addHistoryItem = useCallback((item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
-        const newHistoryItem: HistoryItem = {
-            ...item,
-            id: new Date().toISOString() + Math.random(), // Add random number to ensure uniqueness
-            timestamp: new Date().toISOString(),
-            isFavorite: false,
-        };
-        setHistory(prev => [newHistoryItem, ...prev]);
+        setHistory(prev => {
+            const newHistoryItem: HistoryItem = {
+                ...item,
+                id: new Date().toISOString() + Math.random(),
+                timestamp: new Date().toISOString(),
+                isFavorite: false,
+            };
+            const updatedHistory = [newHistoryItem, ...prev];
+            setInLocalStorage('appHistory', updatedHistory);
+            return updatedHistory;
+        });
     }, []);
 
     const toggleFavorite = useCallback((id: string) => {
-        setHistory(prevHistory =>
-            prevHistory.map(item =>
+        setHistory(prevHistory => {
+            const updatedHistory = prevHistory.map(item =>
                 item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-            )
-        );
+            );
+            setInLocalStorage('appHistory', updatedHistory);
+            return updatedHistory;
+        });
     }, []);
 
     const deleteHistoryItem = useCallback((id: string) => {
-        setHistory(prev => prev.filter(h => h.id !== id));
+        setHistory(prev => {
+            const updatedHistory = prev.filter(h => h.id !== id);
+            setInLocalStorage('appHistory', updatedHistory);
+            return updatedHistory;
+        });
     }, []);
     
     const favorites = history.filter(item => item.isFavorite);
@@ -144,7 +144,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         limitReached: generationsToday >= DAILY_GENERATION_LIMIT,
     };
     
-    // Render children only after mounting to ensure client-side state is ready
     if (!isMounted) {
         return (
             <SidebarProvider defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -154,7 +153,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AppContext.Provider value={{ history, setHistory, favorites, toggleFavorite, deleteHistoryItem, addHistoryItem, profile, setProfile, stats, creditState }}>
+        <AppContext.Provider value={{ history, favorites, toggleFavorite, deleteHistoryItem, addHistoryItem, profile, setProfile, stats, creditState }}>
             <SidebarProvider defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
                 {children}
             </SidebarProvider>
