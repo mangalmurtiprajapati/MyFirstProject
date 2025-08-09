@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { SidebarProvider } from './ui/sidebar';
 import { isToday } from 'date-fns';
 
@@ -80,47 +80,51 @@ const DAILY_GENERATION_LIMIT = 15;
 export function AppProvider({ children }: { children: ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [isMounted, setIsMounted] = useState(false);
-    const [history, setHistory] = useState<HistoryItem[]>([]);
+    
+    // State is initialized directly from localStorage
+    const [history, setHistory] = useState<HistoryItem[]>(() => getFromLocalStorage('appHistory', []));
     const [profile, setProfile] = useState<UserProfile>(() => getFromLocalStorage('userProfile', defaultProfile));
 
-    useEffect(() => {
-        setIsMounted(true);
-        setHistory(getFromLocalStorage('appHistory', []));
-    }, []);
-
+    // Effect to persist history changes to localStorage
     useEffect(() => {
         if (isMounted) {
             setInLocalStorage('appHistory', history);
         }
     }, [history, isMounted]);
 
+    // Effect to persist profile changes to localStorage
     useEffect(() => {
         if (isMounted) {
             setInLocalStorage('userProfile', profile);
         }
     }, [profile, isMounted]);
 
-    const addHistoryItem = (item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
+    // Mark as mounted after the initial render
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    const addHistoryItem = useCallback((item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
         const newHistoryItem: HistoryItem = {
             ...item,
-            id: new Date().toISOString(),
+            id: new Date().toISOString() + Math.random(), // Add random number to ensure uniqueness
             timestamp: new Date().toISOString(),
             isFavorite: false,
         };
         setHistory(prev => [newHistoryItem, ...prev]);
-    };
+    }, []);
 
-    const toggleFavorite = (id: string) => {
+    const toggleFavorite = useCallback((id: string) => {
         setHistory(prevHistory =>
             prevHistory.map(item =>
                 item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
             )
         );
-    };
+    }, []);
 
-    const deleteHistoryItem = (id: string) => {
+    const deleteHistoryItem = useCallback((id: string) => {
         setHistory(prev => prev.filter(h => h.id !== id));
-    };
+    }, []);
     
     const favorites = history.filter(item => item.isFavorite);
 
@@ -140,8 +144,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         limitReached: generationsToday >= DAILY_GENERATION_LIMIT,
     };
     
+    // Render children only after mounting to ensure client-side state is ready
     if (!isMounted) {
-        return null; // or a loading spinner
+        return (
+            <SidebarProvider defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
+                {null}
+            </SidebarProvider>
+        ); 
     }
 
     return (

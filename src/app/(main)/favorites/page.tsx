@@ -18,8 +18,8 @@ export default function FavoritesPage() {
 
   if (!isMounted) {
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-6">Favorite Voices</h1>
+        <div className="space-y-6">
+            <h1 className="text-3xl font-bold">Favorite Voices</h1>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Skeleton className="h-64 w-full" />
                 <Skeleton className="h-64 w-full" />
@@ -30,8 +30,8 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Favorite Voices</h1>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Favorite Voices</h1>
       {favorites.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {favorites.map((item) => (

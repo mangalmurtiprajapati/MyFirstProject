@@ -16,19 +16,19 @@ export function HistoryCard({ item }: HistoryCardProps) {
   const { toggleFavorite, deleteHistoryItem } = useAppContext();
 
   return (
-    <Card className="w-full shadow-lg border-border/60 bg-card/80 backdrop-blur-sm transition-all hover:shadow-xl">
-      <CardHeader>
-        <CardTitle className="truncate text-lg font-bold" title={item.dialogue}>
-          "{item.dialogue}"
+    <Card className="w-full shadow-lg border-border/60 bg-card/80 backdrop-blur-sm transition-all hover:shadow-xl flex flex-col">
+      <CardHeader className="flex-grow">
+        <CardTitle className="text-lg font-bold">
+          <p className="truncate" title={item.dialogue}>"{item.dialogue}"</p>
         </CardTitle>
-        <CardDescription className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-sm">
-          <span className="flex items-center gap-2">
-            <Mic className="h-4 w-4" />
-            {item.voice}
+        <CardDescription className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pt-2 text-sm">
+          <span className="flex items-center gap-2 truncate">
+            <Mic className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{item.voice}</span>
           </span>
-          <span className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            {format(new Date(item.timestamp), "PPP p")}
+          <span className="flex items-center gap-2 truncate">
+            <Calendar className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{format(new Date(item.timestamp), "PPP p")}</span>
           </span>
         </CardDescription>
       </CardHeader>
@@ -39,7 +39,7 @@ export function HistoryCard({ item }: HistoryCardProps) {
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
         <Button variant="ghost" size="icon" onClick={() => toggleFavorite(item.id)} title={item.isFavorite ? "Remove from favorites" : "Add to favorites"}>
-          <Star className={cn("h-5 w-5", item.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground")} />
+          <Star className={cn("h-5 w-5 transition-colors", item.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground hover:text-yellow-400")} />
         </Button>
         <Button variant="ghost" size="icon" asChild title="Download audio">
           <a href={item.audioUrl} download={`${item.voice.replace(' ','_')}-${item.id}.wav`}>
@@ -47,7 +47,7 @@ export function HistoryCard({ item }: HistoryCardProps) {
           </a>
         </Button>
          <Button variant="ghost" size="icon" onClick={() => deleteHistoryItem(item.id)} title="Delete history item">
-            <Trash2 className="h-5 w-5 text-destructive/80" />
+            <Trash2 className="h-5 w-5 text-destructive/80 hover:text-destructive" />
         </Button>
       </CardFooter>
     </Card>

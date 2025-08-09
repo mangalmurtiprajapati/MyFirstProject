@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { generateSyntheticVoice } from "@/ai/flows/generate-synthetic-voice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,22 +37,34 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
   const { toast } = useToast();
 
   useEffect(() => {
-    // If a new voice is added (cloned), select it automatically.
     const allVoiceValues = voices.map(v => v.value);
     if (voices.length > 0 && !allVoiceValues.includes(voice)) {
-      setVoice(voices[voices.length-1].value);
+      setVoice(voices[voices.length - 1].value);
     }
   }, [voices, voice]);
 
+  // This effect ensures that if the history array changes (e.g., an item is favorited from another component),
+  // the `generatedItem` state is updated to reflect that change.
   useEffect(() => {
-    // When the history updates (e.g. favorite status changes), update the local generated item
     if (generatedItem) {
-        const historyItem = history.find(h => h.id === generatedItem.id);
-        if(historyItem) {
-            setGeneratedItem(historyItem);
+        const updatedItem = history.find(h => h.id === generatedItem.id);
+        if (updatedItem) {
+            setGeneratedItem(updatedItem);
+        } else {
+            // The item was deleted from history
+            setGeneratedItem(null);
         }
     }
   }, [history, generatedItem]);
+
+  const findNewestItem = useCallback((prevHistory: HistoryItem[], newHistory: HistoryItem[]) => {
+      // Logic to find the newest item that was just added
+      if (newHistory.length > prevHistory.length) {
+          const newItems = newHistory.filter(newItem => !prevHistory.some(oldItem => oldItem.id === newItem.id));
+          return newItems[0] || null; // Return the first new item found
+      }
+      return null;
+  }, []);
 
   const handleGenerate = async () => {
     if (!dialogue) {
@@ -64,6 +76,9 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     }
     setLoading(true);
     setGeneratedItem(null);
+    
+    const currentHistory = history;
+
     try {
       const result = await generateSyntheticVoice({ dialogue, voice });
 
@@ -73,12 +88,8 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
         audioUrl: result.audioDataUri,
       };
       
+      // Add item to global history. This is now an async update.
       addHistoryItem(newItemData);
-      
-      // Find the newly added item in the history to set it as the generated item
-      const newHistoryItem = history.find(h => h.dialogue === newItemData.dialogue && h.audioUrl === newItemData.audioUrl);
-      
-      setGeneratedItem(newHistoryItem || null);
 
       toast({
         title: "Voice Generated!",
@@ -105,6 +116,20 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
       setLoading(false);
     }
   };
+
+  // This effect listens for changes in history after a generation and sets the generated item.
+  useEffect(() => {
+    if (history.length > 0 && loading === false) {
+      // After loading stops, check if the first item in history is newer than what's displayed.
+      // This is a simplified way to get the latest generated item.
+      if (!generatedItem || generatedItem.id !== history[0].id) {
+          // Check if the dialogue matches to ensure we're showing the correct result
+          if (history[0].dialogue === dialogue) {
+              setGeneratedItem(history[0]);
+          }
+      }
+    }
+  }, [history, loading, dialogue, generatedItem]);
   
   return (
     <Card className="w-full shadow-xl border-border/60 bg-card/80 backdrop-blur-sm">
