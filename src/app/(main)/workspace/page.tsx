@@ -46,9 +46,8 @@ const uniqueVoices: Voice[] = [
   { value: "fenrir", label: "Beastly Howl" },
   { value: "iapetus", label: "Ancient Titan" },
   { value: "kore", label: "Whispering Nymph" },
-  { value: "puck", label: "Mischievous Sprite" },
+  { value: "puck", label: "Mad Scientist (Gold)" },
   { value: "pulcherrima", label: "Celestial Singer" },
-  { value: "tyndareus", label: "Mad Scientist (Gold)" },
 ];
 
 const allVoices = [...maleVoices, ...femaleVoices, ...uniqueVoices];
