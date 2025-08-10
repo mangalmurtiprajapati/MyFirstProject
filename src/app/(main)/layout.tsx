@@ -8,7 +8,7 @@ export default function MainAreaLayout({
 }) {
   return (
     <MainLayout>
-        <div className="container relative py-6">{children}</div>
+        <div className="relative py-6">{children}</div>
     </MainLayout>
   )
 }
