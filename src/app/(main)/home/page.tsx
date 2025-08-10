@@ -12,7 +12,7 @@ export default function HomePage() {
         <p className="mt-6 text-lg leading-8 text-muted-foreground">
           Your premier AI-powered solution for voice cloning and generation. Create unique synthetic voices or clone existing ones with unparalleled realism.
         </p>
-        <div className="mt-10 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
+        <div className="mt-10 flex items-center justify-center gap-x-6">
           <Button asChild size="lg">
             <Link href="/workspace">
               <Mic className="mr-2" />
