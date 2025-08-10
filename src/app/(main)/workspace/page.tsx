@@ -48,6 +48,7 @@ const uniqueVoices: Voice[] = [
   { value: "kore", label: "Whispering Nymph" },
   { value: "puck", label: "Mischievous Sprite" },
   { value: "pulcherrima", label: "Celestial Singer" },
+  { value: "tyndareus", label: "Mad Scientist (Gold)" },
 ];
 
 const allVoices = [...maleVoices, ...femaleVoices, ...uniqueVoices];
@@ -97,7 +98,7 @@ export default function WorkspacePage() {
                         </Link>
                     </Button>
                 </div>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {recentHistory.map((item) => (
                         <HistoryCard key={item.id} item={item} />
                     ))}
