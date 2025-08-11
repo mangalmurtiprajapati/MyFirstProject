@@ -23,18 +23,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AppProvider>
-            {children}
-          </AppProvider>
-          <Toaster />
-        </ThemeProvider>
+      <body>
+        <script async custom-element="amp-auto-ads"
+          src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+        </script>
+        <div className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AppProvider>
+              {children}
+            </AppProvider>
+            <Toaster />
+          </ThemeProvider>
+        </div>
       </body>
     </html>
   );
