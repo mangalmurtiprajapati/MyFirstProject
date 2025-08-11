@@ -27,6 +27,9 @@ export default function RootLayout({
         <script async custom-element="amp-auto-ads"
           src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
         </script>
+        <amp-auto-ads type="adsense"
+            data-ad-client="ca-pub-1077054148062197">
+        </amp-auto-ads>
         <div className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
           <ThemeProvider
             attribute="class"
