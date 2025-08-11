@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center">
+    <div className="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center p-4">
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Welcome to VocalForge

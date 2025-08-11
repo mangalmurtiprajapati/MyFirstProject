@@ -37,10 +37,9 @@ export function AnimatedHeader() {
       )}
     >
       <div className="container flex h-16 items-center">
-        <div className="mr-4 hidden md:flex">
-          <button className="mr-2" onClick={toggleSidebar}>
-            <VocalForgeLogo className="h-8 w-8" />
-          </button>
+        <div className="mr-4 hidden md:flex items-center gap-2.5">
+          <VocalForgeLogo className="h-8 w-8 text-primary" />
+          <span className="text-lg font-semibold">VocalForge</span>
         </div>
         
         <div className="flex items-center md:hidden">
