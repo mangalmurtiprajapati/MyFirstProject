@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AppProvider } from '@/components/app-provider';
-import { Inter as FontSans } from "next/font/google"
+import { Poppins as FontSans } from "next/font/google"
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme-provider';
 
 const fontSans = FontSans({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-sans",
 })
 

@@ -7,6 +7,7 @@ import { Star, Download, Trash2, Mic, Calendar } from "lucide-react";
 import { HistoryItem, useAppContext } from "./app-provider";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { AudioPlayer } from "./audio-player";
 
 interface HistoryCardProps {
   item: HistoryItem;
@@ -33,9 +34,7 @@ export function HistoryCard({ item }: HistoryCardProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-4 md:px-6">
-        <audio controls src={item.audioUrl} className="w-full rounded-lg h-10">
-          Your browser does not support the audio element.
-        </audio>
+        <AudioPlayer audioUrl={item.audioUrl} audioId={item.id} />
       </CardContent>
       <CardFooter className="flex justify-end gap-1 p-2 md:p-3">
         <Button variant="ghost" size="icon" onClick={() => toggleFavorite(item.id)} title={item.isFavorite ? "Remove from favorites" : "Add to favorites"}>

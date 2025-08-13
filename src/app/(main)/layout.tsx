@@ -9,7 +9,7 @@ export default function MainAreaLayout({
 }) {
   return (
     <MainLayout>
-        <div className="relative py-6 px-4 sm:px-6 lg:px-8">{children}</div>
+        <div className="relative p-4 sm:p-6 lg:p-8">{children}</div>
     </MainLayout>
   )
 }

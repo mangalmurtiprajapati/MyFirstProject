@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
 import { SidebarProvider } from './ui/sidebar';
 import { isToday } from 'date-fns';
 
@@ -41,7 +41,9 @@ interface AppContextType {
     creditsUsed: number;
     creditsRemaining: number;
     limitReached: boolean;
-  }
+  };
+  currentlyPlayingId: string | null;
+  setCurrentlyPlayingId: (id: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -82,6 +84,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     const [history, setHistory] = useState<HistoryItem[]>([]);
     const [profile, setProfileState] = useState<UserProfile>(defaultProfile);
+    const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
 
     useEffect(() => {
         setHistory(getFromLocalStorage('appHistory', []));
@@ -153,7 +156,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AppContext.Provider value={{ history, favorites, toggleFavorite, deleteHistoryItem, addHistoryItem, profile, setProfile, stats, creditState }}>
+        <AppContext.Provider value={{ history, favorites, toggleFavorite, deleteHistoryItem, addHistoryItem, profile, setProfile, stats, creditState, currentlyPlayingId, setCurrentlyPlayingId }}>
             <SidebarProvider defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
                 {children}
             </SidebarProvider>

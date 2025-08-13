@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { generateSyntheticVoice } from "@/ai/flows/generate-synthetic-voice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { Loader2, Bot, Download, Mic, User, SparklesIcon, Music4, Star } from "l
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from './ui/select';
 import { useAppContext, HistoryItem } from './app-provider';
 import { cn } from '@/lib/utils';
+import { AudioPlayer } from './audio-player';
 
 export interface Voice {
     value: string;
@@ -199,9 +200,7 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
                         <Star className={cn("h-6 w-6 transition-all", generatedItem.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground hover:text-yellow-400")} />
                     </Button>
                 </div>
-                <audio controls src={generatedItem.audioUrl} className="w-full rounded-lg">
-                    Your browser does not support the audio element.
-                </audio>
+                <AudioPlayer audioUrl={generatedItem.audioUrl} audioId={generatedItem.id} />
                 <Button asChild variant="outline" className="w-full h-11 text-base font-semibold">
                     <a href={generatedItem.audioUrl} download="vocalforge_voice.wav">
                         <Download className="mr-2 h-5 w-5" />
