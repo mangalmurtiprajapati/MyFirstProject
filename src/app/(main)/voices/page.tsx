@@ -11,43 +11,53 @@ import { Check, Mic, Sparkles, User as UserIcon } from "lucide-react";
 import Link from 'next/link';
 import { useAppContext } from '@/components/app-provider';
 import type { Voice } from '@/components/generate-voice-form';
+import Image from 'next/image';
 
 interface VoiceProfile extends Voice {
     description: string;
     tone: string;
     category: 'male' | 'female' | 'unique' | 'cloned';
+    image: string;
+    hint: string;
 }
 
 const maleVoices: VoiceProfile[] = [
-  { value: "algenib", label: "Deep Male", description: "A resonant and authoritative voice, perfect for narration.", tone: "Deep", category: 'male' },
-  { value: "gacrux", label: "Standard Male", description: "A clear and neutral male voice for general use.", tone: "Clear", category: 'male' },
-  { value: "zubenelgenubi", label: "Narrator Male", description: "A professional and engaging voice for storytelling.", tone: "Engaging", category: 'male' },
-  { value: "rasalgethi", label: "Raspy Male", description: "A gravelly and textured voice with character.", tone: "Raspy", category: 'male' },
-  { value: "sadachbia", label: "Smooth Male", description: "A silky and smooth voice, ideal for commercials.", tone: "Smooth", category: 'male' },
+  { value: "algenib", label: "Deep Male", description: "A resonant and authoritative voice, perfect for narration.", tone: "Deep", category: 'male', image: "https://placehold.co/600x400.png", hint: "authoritative man" },
+  { value: "gacrux", label: "Standard Male", description: "A clear and neutral male voice for general use.", tone: "Clear", category: 'male', image: "https://placehold.co/600x400.png", hint: "neutral man" },
+  { value: "zubenelgenubi", label: "Narrator Male", description: "A professional and engaging voice for storytelling.", tone: "Engaging", category: 'male', image: "https://placehold.co/600x400.png", hint: "storyteller man" },
+  { value: "rasalgethi", label: "Raspy Male", description: "A gravelly and textured voice with character.", tone: "Raspy", category: 'male', image: "https://placehold.co/600x400.png", hint: "rugged man" },
+  { value: "sadachbia", label: "Smooth Male", description: "A silky and smooth voice, ideal for commercials.", tone: "Smooth", category: 'male', image: "https://placehold.co/600x400.png", hint: "smooth talker" },
 ];
 
 const femaleVoices: VoiceProfile[] = [
-  { value: "achernar", label: "Standard Female", description: "A clear and neutral female voice for versatile applications.", tone: "Clear", category: 'female' },
-  { value: "schedar", label: "Warm Female", description: "A friendly and inviting voice, great for tutorials.", tone: "Warm", category: 'female' },
-  { value: "vindemiatrix", label: "Crisp Female", description: "A sharp and articulate voice for announcements.", tone: "Crisp", category: 'female' },
-  { value: "achird", label: "Gentle Female", description: "A soft and soothing voice, perfect for meditation content.", tone: "Gentle", category: 'female' },
-  { value: "laomedeia", label: "Elegant Female", description: "A sophisticated and graceful voice for high-end branding.", tone: "Elegant", category: 'female' },
+  { value: "achernar", label: "Standard Female", description: "A clear and neutral female voice for versatile applications.", tone: "Clear", category: 'female', image: "https://placehold.co/600x400.png", hint: "neutral woman" },
+  { value: "schedar", label: "Warm Female", description: "A friendly and inviting voice, great for tutorials.", tone: "Warm", category: 'female', image: "https://placehold.co/600x400.png", hint: "friendly woman" },
+  { value: "vindemiatrix", label: "Crisp Female", description: "A sharp and articulate voice for announcements.", tone: "Crisp", category: 'female', image: "https://placehold.co/600x400.png", hint: "professional woman" },
+  { value: "achird", label: "Gentle Female", description: "A soft and soothing voice, perfect for meditation content.", tone: "Gentle", category: 'female', image: "https://placehold.co/600x400.png", hint: "gentle woman" },
+  { value: "laomedeia", label: "Elegant Female", description: "A sophisticated and graceful voice for high-end branding.", tone: "Elegant", category: 'female', image: "https://placehold.co/600x400.png", hint: "elegant woman" },
 ];
 
 const uniqueVoices: VoiceProfile[] = [
-  { value: "aoede", label: "Mythic Bard", description: "A story-telling voice with a touch of ancient magic.", tone: "Mystical", category: 'unique' },
-  { value: "autonoe", label: "Robotic Assistant", description: "A futuristic and clear robotic voice for tech applications.", tone: "Robotic", category: 'unique' },
-  { value: "callirrhoe", label: "Galactic Herald", description: "An epic and booming voice from the cosmos.", tone: "Epic", category: 'unique' },
-  { value: "charon", label: "Underworld Guide", description: "A deep, mysterious, and echoing voice.", tone: "Ethereal", category: 'unique' },
-  { value: "fenrir", label: "Beastly Howl", description: "A rough, aggressive, and creature-like voice.", tone: "Aggressive", category: 'unique' },
+  { value: "aoede", label: "Mythic Bard", description: "A story-telling voice with a touch of ancient magic.", tone: "Mystical", category: 'unique', image: "https://placehold.co/600x400.png", hint: "fantasy bard" },
+  { value: "autonoe", label: "Robotic Assistant", description: "A futuristic and clear robotic voice for tech applications.", tone: "Robotic", category: 'unique', image: "https://placehold.co/600x400.png", hint: "futuristic robot" },
+  { value: "callirrhoe", label: "Galactic Herald", description: "An epic and booming voice from the cosmos.", tone: "Epic", category: 'unique', image: "https://placehold.co/600x400.png", hint: "cosmic being" },
+  { value: "charon", label: "Underworld Guide", description: "A deep, mysterious, and echoing voice.", tone: "Ethereal", category: 'unique', image: "https://placehold.co/600x400.png", hint: "mythological guide" },
+  { value: "fenrir", label: "Beastly Howl", description: "A rough, aggressive, and creature-like voice.", tone: "Aggressive", category: 'unique', image: "https://placehold.co/600x400.png", hint: "fierce wolf" },
 ];
 
 export default function VoicesPage() {
-    // In a real app, cloned voices would come from user data
     const { history } = useAppContext(); 
     const clonedVoices: VoiceProfile[] = history
         .filter(h => !maleVoices.find(v => v.label === h.voice) && !femaleVoices.find(v => v.label === h.voice) && !uniqueVoices.find(v => v.label === h.voice))
-        .map(h => ({ value: h.voice, label: h.voice, description: "A user-cloned voice.", tone: "Custom", category: 'cloned' }))
+        .map(h => ({ 
+            value: h.voice, 
+            label: h.voice, 
+            description: "A user-cloned voice.", 
+            tone: "Custom", 
+            category: 'cloned', 
+            image: "https://placehold.co/600x400.png",
+            hint: "custom person" 
+        }))
         .filter((v, i, a) => a.findIndex(t => (t.label === v.label)) === i); // Unique cloned voices
 
 
@@ -78,19 +88,15 @@ export default function VoicesPage() {
                 {Object.entries(allVoices).map(([category, voices]) => (
                     <TabsContent key={category} value={category}>
                         {voices.length > 0 ? (
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {voices.map(voice => (
-                                    <Card key={voice.value} className="flex flex-col">
-                                        <CardHeader className="flex-row items-start gap-4 space-y-0">
-                                            <Avatar>
-                                                <AvatarFallback>
-                                                    {voice.category === 'male' || voice.category === 'female' ? <UserIcon/> : voice.category === 'unique' ? <Sparkles/> : <Mic/>}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1">
-                                                <CardTitle>{voice.label}</CardTitle>
-                                                <CardDescription className="line-clamp-2">{voice.description}</CardDescription>
-                                            </div>
+                                    <Card key={voice.value} className="flex flex-col overflow-hidden transition-all hover:shadow-xl">
+                                        <div className="aspect-video relative overflow-hidden w-full">
+                                            <Image src={voice.image} alt={voice.label} fill className="object-cover" data-ai-hint={voice.hint} />
+                                        </div>
+                                        <CardHeader>
+                                            <CardTitle>{voice.label}</CardTitle>
+                                            <CardDescription className="line-clamp-2 h-[40px]">{voice.description}</CardDescription>
                                         </CardHeader>
                                         <CardContent className="flex-grow">
                                             <Badge variant="outline">{voice.tone}</Badge>
@@ -125,4 +131,3 @@ export default function VoicesPage() {
         </div>
     );
 }
-
