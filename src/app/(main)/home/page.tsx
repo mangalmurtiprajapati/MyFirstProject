@@ -13,14 +13,14 @@ export default function HomePage() {
         <p className="mt-6 text-lg leading-8 text-muted-foreground">
           Your premier AI-powered solution for voice cloning and generation. Create unique synthetic voices or clone existing ones with unparalleled realism.
         </p>
-        <div className="mt-10 flex items-center justify-center gap-x-6">
-          <Button asChild size="lg">
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button asChild size="lg" className="w-full sm:w-auto">
             <Link href="/workspace">
               <Mic className="mr-2" />
               Go to Workspace
             </Link>
           </Button>
-          <Button asChild variant="link" size="lg">
+          <Button asChild variant="link" size="lg" className="w-full sm:w-auto">
             <Link href="/learn-more">Learn more <span aria-hidden="true">→</span></Link>
           </Button>
         </div>
