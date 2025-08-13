@@ -34,22 +34,31 @@ export default function LoginPage() {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setLoading(true)
-    // Simulate API call
+    
+    // Simulate API call and credential validation
     setTimeout(() => {
-      // In a real app, you'd verify credentials. Here, we'll just log the user in.
-      // You might want to fetch a real user profile from your backend.
-      const userProfile = {
-        name: values.email.split('@')[0],
-        email: values.email,
-        avatar: `https://placehold.co/100x100.png`,
-        initials: values.email.substring(0,2).toUpperCase(),
-        bio: "Logged in user."
+      // In a real app, you'd verify credentials against a backend.
+      // Here, we'll use hardcoded values for demonstration.
+      if (values.email === "admin@example.com" && values.password === "password123") {
+          const userProfile = {
+            name: "Admin User",
+            email: values.email,
+            avatar: `https://placehold.co/100x100.png`,
+            initials: "AU",
+            bio: "Logged in administrator."
+          }
+          login(userProfile)
+          toast({
+            title: "Login Successful!",
+            description: "Welcome back!",
+          })
+      } else {
+        toast({
+            variant: "destructive",
+            title: "Login Failed",
+            description: "Invalid email or password. Please try again.",
+        })
       }
-      login(userProfile)
-      toast({
-        title: "Login Successful!",
-        description: "Welcome back!",
-      })
       setLoading(false)
     }, 1000)
   }
@@ -112,3 +121,5 @@ export default function LoginPage() {
     </Card>
   )
 }
+
+    

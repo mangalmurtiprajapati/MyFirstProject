@@ -11,9 +11,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Clipboard, Check, Sparkles } from "lucide-react";
+import { Loader2, Upload, Clipboard, Check, Sparkles, LogIn } from "lucide-react";
 import type { Voice } from "./generate-voice-form";
 import { Label } from "./ui/label";
+import { useAppContext } from "./app-provider";
+import Link from "next/link";
 
 const formSchema = z.object({
   voiceName: z.string().min(1, "Please enter a name for your voice."),
@@ -32,6 +34,7 @@ export function CloneVoiceForm({ onVoiceCloned, allVoices }: CloneVoiceFormProps
   const [isCopied, setIsCopied] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { toast } = useToast();
+  const { isAuthenticated } = useAppContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -117,6 +120,25 @@ export function CloneVoiceForm({ onVoiceCloned, allVoices }: CloneVoiceFormProps
     toast({ title: "Model ID copied to clipboard!" });
     setTimeout(() => setIsCopied(false), 3000);
   };
+
+  if (!isAuthenticated) {
+      return (
+        <Card className="w-full shadow-xl border-border/60 bg-card/80 backdrop-blur-sm text-center p-6">
+            <CardHeader>
+                <CardTitle>Login to Clone Voices</CardTitle>
+                <CardDescription>You need to be logged in to clone new voices.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button asChild>
+                    <Link href="/auth/login">
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Login to Continue
+                    </Link>
+                </Button>
+            </CardContent>
+        </Card>
+      );
+  }
 
   return (
     <Card className="w-full shadow-xl border-border/60 bg-card/80 backdrop-blur-sm">
@@ -228,3 +250,5 @@ export function CloneVoiceForm({ onVoiceCloned, allVoices }: CloneVoiceFormProps
     </Card>
   );
 }
+
+    

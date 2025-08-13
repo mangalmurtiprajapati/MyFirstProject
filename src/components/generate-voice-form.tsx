@@ -8,11 +8,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Bot, Download, Mic, User, SparklesIcon, Music4, Star } from "lucide-react";
+import { Loader2, Bot, Download, Mic, User, SparklesIcon, Music4, Star, LogIn } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from './ui/select';
 import { useAppContext, HistoryItem } from './app-provider';
 import { cn } from '@/lib/utils';
 import { AudioPlayer } from './audio-player';
+import Link from 'next/link';
 
 export interface Voice {
     value: string;
@@ -29,7 +30,7 @@ interface GenerateVoiceFormProps {
 }
 
 export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceFormProps) {
-  const { history, addHistoryItem, toggleFavorite, creditState } = useAppContext();
+  const { history, addHistoryItem, toggleFavorite, creditState, isAuthenticated } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [generatedItem, setGeneratedItem] = useState<HistoryItem | null>(null);
   const [dialogue, setDialogue] = useState("");
@@ -173,19 +174,36 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
         </div>
       </CardContent>
       <CardFooter className="flex-col items-stretch gap-4 p-6">
-        <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice || creditState.limitReached} size="lg" className="h-14 text-lg font-bold">
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Bot className="mr-2 h-5 w-5" />
-              Generate Voice
-            </>
-          )}
-        </Button>
+        {!isAuthenticated ? (
+            <Card className="text-center p-6 bg-muted/50">
+                <CardHeader>
+                    <CardTitle>Login to Generate</CardTitle>
+                    <CardDescription>You need to be logged in to generate voices.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button asChild>
+                        <Link href="/auth/login">
+                            <LogIn className="mr-2 h-4 w-4" />
+                            Login to Continue
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        ) : (
+            <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice || creditState.limitReached} size="lg" className="h-14 text-lg font-bold">
+            {loading ? (
+                <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Generating...
+                </>
+            ) : (
+                <>
+                <Bot className="mr-2 h-5 w-5" />
+                Generate Voice
+                </>
+            )}
+            </Button>
+        )}
         {generatedItem && (
           <div className="mt-4 animate-in fade-in-50">
              <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-background to-secondary/30 p-4 space-y-4 shadow-lg">
@@ -214,3 +232,5 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     </Card>
   );
 }
+
+    
