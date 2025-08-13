@@ -6,12 +6,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Mic, Star, History, Edit } from "lucide-react";
+import { Mic, Star, History, Edit, LogIn, UserPlus } from "lucide-react";
 import { useAppContext } from "@/components/app-provider";
 import { EditProfileSheet } from "@/components/edit-profile-sheet";
+import Link from "next/link";
 
 export default function ProfilePage() {
-    const { profile, stats } = useAppContext();
+    const { profile, stats, isAuthenticated, logout } = useAppContext();
     const [isSheetOpen, setIsSheetOpen] = useState(false);
 
     const statItems = [
@@ -19,6 +20,35 @@ export default function ProfilePage() {
         { icon: Star, label: "Favorites", value: stats.favoritesCount },
         { icon: History, label: "History Items", value: stats.historyItems },
     ];
+
+    if (!isAuthenticated) {
+        return (
+            <div className="flex items-center justify-center min-h-[calc(100vh-20rem)]">
+                <Card className="max-w-md w-full text-center p-8">
+                    <CardHeader>
+                        <CardTitle className="text-2xl">Join VocalForge</CardTitle>
+                        <CardDescription>
+                            Log in or create an account to manage your profile and track your creations.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4">
+                       <Button asChild size="lg">
+                           <Link href="/auth/login">
+                                <LogIn className="mr-2" />
+                                Login
+                           </Link>
+                       </Button>
+                       <Button asChild variant="outline" size="lg">
+                           <Link href="/auth/register">
+                                <UserPlus className="mr-2" />
+                                Register
+                           </Link>
+                       </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-8">
@@ -43,10 +73,13 @@ export default function ProfilePage() {
                         <CardContent className="text-center px-4 md:px-6">
                             <p className="text-sm text-muted-foreground">{profile.bio}</p>
                         </CardContent>
-                        <CardFooter className="px-4 pb-4 md:px-6 md:pb-6">
+                        <CardFooter className="flex-col gap-2 px-4 pb-4 md:px-6 md:pb-6">
                             <Button variant="outline" className="w-full" onClick={() => setIsSheetOpen(true)}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit Profile
+                            </Button>
+                             <Button variant="destructive" className="w-full" onClick={logout}>
+                                Logout
                             </Button>
                         </CardFooter>
                     </Card>

@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
 import { SidebarProvider } from './ui/sidebar';
 import { isToday } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 export interface HistoryItem {
   id: string;
@@ -44,6 +45,9 @@ interface AppContextType {
   };
   currentlyPlayingId: string | null;
   setCurrentlyPlayingId: (id: string | null) => void;
+  isAuthenticated: boolean;
+  login: (user: UserProfile) => void;
+  logout: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -76,26 +80,59 @@ const defaultProfile: UserProfile = {
     bio: "AI enthusiast and sound designer, exploring the future of voice synthesis with VocalForge."
 };
 
+const guestProfile: UserProfile = {
+    name: "Guest User",
+    email: "",
+    avatar: "",
+    initials: "G",
+    bio: "Log in to save your profile and creations."
+}
+
 const DAILY_GENERATION_LIMIT = 15;
 
 export function AppProvider({ children }: { children: ReactNode }) {
+    const router = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [isMounted, setIsMounted] = useState(false);
     
     const [history, setHistory] = useState<HistoryItem[]>([]);
-    const [profile, setProfileState] = useState<UserProfile>(defaultProfile);
+    const [profile, setProfileState] = useState<UserProfile>(guestProfile);
     const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
+        const storedProfile = getFromLocalStorage('userProfile', null);
+        if (storedProfile) {
+            setProfileState(storedProfile);
+            setIsAuthenticated(true);
+        } else {
+            setProfileState(guestProfile);
+            setIsAuthenticated(false);
+        }
         setHistory(getFromLocalStorage('appHistory', []));
-        setProfileState(getFromLocalStorage('userProfile', defaultProfile));
         setIsMounted(true);
     }, []);
 
     const setProfile = useCallback((newProfile: UserProfile) => {
         setProfileState(newProfile);
-        setInLocalStorage('userProfile', newProfile);
-    }, []);
+        if (isAuthenticated) {
+            setInLocalStorage('userProfile', newProfile);
+        }
+    }, [isAuthenticated]);
+    
+    const login = useCallback((user: UserProfile) => {
+        setProfileState(user);
+        setIsAuthenticated(true);
+        setInLocalStorage('userProfile', user);
+        router.push('/profile');
+    }, [router]);
+    
+    const logout = useCallback(() => {
+        setProfileState(guestProfile);
+        setIsAuthenticated(false);
+        localStorage.removeItem('userProfile');
+        router.push('/home');
+    }, [router]);
 
     const addHistoryItem = useCallback((item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
         setHistory(prev => {
@@ -156,7 +193,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AppContext.Provider value={{ history, favorites, toggleFavorite, deleteHistoryItem, addHistoryItem, profile, setProfile, stats, creditState, currentlyPlayingId, setCurrentlyPlayingId }}>
+        <AppContext.Provider value={{ history, favorites, toggleFavorite, deleteHistoryItem, addHistoryItem, profile, setProfile, stats, creditState, currentlyPlayingId, setCurrentlyPlayingId, isAuthenticated, login, logout }}>
             <SidebarProvider defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
                 {children}
             </SidebarProvider>
