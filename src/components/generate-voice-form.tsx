@@ -26,17 +26,24 @@ interface GenerateVoiceFormProps {
         male: Voice[];
         female: Voice[];
         unique: Voice[];
-    }
+    };
+    preselectedVoice?: string | null;
 }
 
-export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceFormProps) {
+export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }: GenerateVoiceFormProps) {
   const { history, addHistoryItem, toggleFavorite, creditState, isAuthenticated, profile } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [generatedItem, setGeneratedItem] = useState<HistoryItem | null>(null);
   const [dialogue, setDialogue] = useState("");
-  const [voice, setVoice] = useState(voices.length > 0 ? voiceCategories.male[0].value : "");
+  const [voice, setVoice] = useState(preselectedVoice || (voices.length > 0 ? voiceCategories.male[0].value : ""));
   
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (preselectedVoice) {
+      setVoice(preselectedVoice);
+    }
+  }, [preselectedVoice]);
 
   useEffect(() => {
     const allVoiceValues = voices.map(v => v.value);

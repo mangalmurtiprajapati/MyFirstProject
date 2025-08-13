@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GenerateVoiceForm, Voice } from "@/components/generate-voice-form";
 import { CloneVoiceForm } from "@/components/clone-voice-form";
@@ -12,6 +12,7 @@ import { HistoryCard } from "@/components/history-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { History, LayoutGrid } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const maleVoices: Voice[] = [
   { value: "algenib", label: "Deep Male" },
@@ -52,10 +53,19 @@ const uniqueVoices: Voice[] = [
 
 const allVoices = [...maleVoices, ...femaleVoices, ...uniqueVoices];
 
-export default function WorkspacePage() {
+function WorkspaceComponent() {
+  const searchParams = useSearchParams();
+  const selectedVoice = searchParams.get('voice');
+  
   const [voices, setVoices] = useState<Voice[]>(allVoices);
   const [activeTab, setActiveTab] = useState("generate");
   const { history } = useAppContext();
+
+  useEffect(() => {
+    if (selectedVoice) {
+      setActiveTab("generate");
+    }
+  }, [selectedVoice]);
 
   const addClonedVoice = (newVoice: Voice) => {
     setVoices((prevVoices) => [...prevVoices, newVoice]);
@@ -79,7 +89,11 @@ export default function WorkspacePage() {
             <TabsTrigger value="clone" className="text-base rounded-lg">Clone Voice</TabsTrigger>
           </TabsList>
           <TabsContent value="generate" className="mt-6">
-            <GenerateVoiceForm voices={voices} voiceCategories={{male: maleVoices, female: femaleVoices, unique: uniqueVoices}} />
+            <GenerateVoiceForm 
+              voices={voices} 
+              voiceCategories={{male: maleVoices, female: femaleVoices, unique: uniqueVoices}}
+              preselectedVoice={selectedVoice}
+            />
           </TabsContent>
           <TabsContent value="clone" className="mt-6">
             <CloneVoiceForm onVoiceCloned={addClonedVoice} allVoices={allVoices} />
@@ -105,5 +119,13 @@ export default function WorkspacePage() {
             </div>
         )}
     </div>
+  );
+}
+
+export default function WorkspacePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <WorkspaceComponent />
+    </Suspense>
   );
 }

@@ -5,12 +5,13 @@ import { usePathname } from 'next/navigation';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator } from "./ui/sidebar";
 import { VocalForgeLogo } from "./vocal-forge-logo";
 import { AnimatedHeader } from './animated-header';
-import { Home, Settings, Mic, History, Star, User } from 'lucide-react';
+import { Home, Settings, Mic, History, Star, User, Users } from 'lucide-react';
 import { AppFooter } from './app-footer';
 
 const navItems = [
     { href: "/home", icon: Home, label: "Home" },
     { href: "/workspace", icon: Mic, label: "Workspace" },
+    { href: "/voices", icon: Users, label: "Voices" },
     { href: "/history", icon: History, label: "History" },
     { href: "/favorites", icon: Star, label: "Favorites" },
 ];
