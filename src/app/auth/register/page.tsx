@@ -13,12 +13,20 @@ import { useAppContext } from "@/components/app-provider"
 import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+  humanVerification: z.boolean().refine(val => val === true, { message: "Please verify you are human." }),
 })
+
+const storeUser = (values: z.infer<typeof formSchema>) => {
+    if (typeof window === 'undefined') return;
+    const { name, email, password } = values;
+    localStorage.setItem(`user_${email}`, JSON.stringify({ name, email, password }));
+}
 
 export default function RegisterPage() {
   const { login } = useAppContext()
@@ -31,6 +39,7 @@ export default function RegisterPage() {
       name: "",
       email: "",
       password: "",
+      humanVerification: false,
     },
   })
 
@@ -38,8 +47,9 @@ export default function RegisterPage() {
     setLoading(true)
     // Simulate API call for registration
     setTimeout(() => {
-      // In a real app, you would create the user in your database.
-      // Here we'll just log them in immediately.
+      // Store user details in localStorage
+      storeUser(values);
+
       const userProfile = {
         name: values.name,
         email: values.email,
@@ -101,6 +111,26 @@ export default function RegisterPage() {
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="humanVerification"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Verify you are human
+                    </FormLabel>
+                  </div>
+                   <FormMessage />
                 </FormItem>
               )}
             />

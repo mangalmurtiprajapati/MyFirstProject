@@ -72,14 +72,6 @@ const setInLocalStorage = <T,>(key: string, value: T) => {
     }
 };
 
-const defaultProfile: UserProfile = {
-    name: "Alex Doe",
-    email: "alex.doe@example.com",
-    avatar: "https://placehold.co/100x100.png",
-    initials: "AD",
-    bio: "AI enthusiast and sound designer, exploring the future of voice synthesis with VocalForge."
-};
-
 const guestProfile: UserProfile = {
     name: "Guest User",
     email: "",
@@ -120,16 +112,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const setProfile = useCallback((newProfile: UserProfile) => {
         setProfileState(newProfile);
-        if (isAuthenticated) {
+        if (isAuthenticated && profile.email) {
             setInLocalStorage('userProfile', newProfile);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, profile.email]);
     
     const login = useCallback((user: UserProfile) => {
         setProfileState(user);
-        setIsAuthenticated(true);
-        setInLocalStorage('userProfile', user);
-        setHistory(getFromLocalStorage(getHistoryKey(user.email), []));
+        setIsAuthenticated(!!user.email);
+        if(user.email){
+            setInLocalStorage('userProfile', user);
+            setHistory(getFromLocalStorage(getHistoryKey(user.email), []));
+        } else {
+             setHistory([]); // Guest user
+        }
         router.push('/profile');
     }, [router]);
     
@@ -137,12 +133,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setProfileState(guestProfile);
         setIsAuthenticated(false);
         setHistory([]);
-        localStorage.removeItem('userProfile');
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('userProfile');
+        }
         router.push('/home');
     }, [router]);
 
     const addHistoryItem = useCallback((item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated || !profile.email) return;
         setHistory(prev => {
             const newHistoryItem: HistoryItem = {
                 ...item,
@@ -157,7 +155,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }, [isAuthenticated, profile.email]);
 
     const toggleFavorite = useCallback((id: string) => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated || !profile.email) return;
         setHistory(prevHistory => {
             const updatedHistory = prevHistory.map(item =>
                 item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
@@ -168,7 +166,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }, [isAuthenticated, profile.email]);
 
     const deleteHistoryItem = useCallback((id: string) => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated || !profile.email) return;
         setHistory(prev => {
             const updatedHistory = prev.filter(h => h.id !== id);
             setInLocalStorage(getHistoryKey(profile.email), updatedHistory);

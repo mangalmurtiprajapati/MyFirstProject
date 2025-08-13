@@ -13,11 +13,18 @@ import { useAppContext } from "@/components/app-provider"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
+import { Separator } from "@/components/ui/separator"
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(1, { message: "Password is required." }),
 })
+
+const getStoredUser = (email: string) => {
+    if (typeof window === 'undefined') return null;
+    const storedUser = localStorage.getItem(`user_${email}`);
+    return storedUser ? JSON.parse(storedUser) : null;
+}
 
 export default function LoginPage() {
   const { login } = useAppContext()
@@ -37,15 +44,15 @@ export default function LoginPage() {
     
     // Simulate API call and credential validation
     setTimeout(() => {
-      // In a real app, you'd verify credentials against a backend.
-      // Here, we'll use hardcoded values for demonstration.
-      if (values.email === "admin@example.com" && values.password === "password123") {
+      const storedUser = getStoredUser(values.email);
+      
+      if (storedUser && storedUser.password === values.password) {
           const userProfile = {
-            name: "Admin User",
-            email: values.email,
+            name: storedUser.name,
+            email: storedUser.email,
             avatar: `https://placehold.co/100x100.png`,
-            initials: "AU",
-            bio: "Logged in administrator."
+            initials: storedUser.name.substring(0,2).toUpperCase(),
+            bio: "Logged in user."
           }
           login(userProfile)
           toast({
@@ -61,6 +68,20 @@ export default function LoginPage() {
       }
       setLoading(false)
     }, 1000)
+  }
+
+  const handleGuestLogin = () => {
+    login({
+        name: "Guest User",
+        email: "",
+        avatar: "",
+        initials: "G",
+        bio: "Exploring in Guest Mode."
+    });
+    toast({
+        title: "Logged in as Guest",
+        description: "You are browsing as a guest. History and favorites will not be saved."
+    });
   }
 
   return (
@@ -109,7 +130,19 @@ export default function LoginPage() {
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Log In
             </Button>
-            <p className="text-sm text-muted-foreground">
+            
+            <div className="relative w-full">
+                <Separator className="my-2" />
+                <p className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">OR</p>
+            </div>
+
+            <div className="w-full grid grid-cols-2 gap-2">
+                <Button variant="outline" disabled>Continue w/ Google</Button>
+                <Button variant="outline" disabled>Continue w/ Facebook</Button>
+            </div>
+            <Button variant="secondary" className="w-full" onClick={handleGuestLogin}>Continue as Guest</Button>
+
+            <p className="text-sm text-muted-foreground pt-2">
               Don't have an account?{" "}
               <Button asChild variant="link" className="p-0 h-auto">
                 <Link href="/auth/register">Register</Link>
@@ -121,5 +154,3 @@ export default function LoginPage() {
     </Card>
   )
 }
-
-    

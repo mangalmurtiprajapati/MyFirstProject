@@ -3,6 +3,8 @@
 
 import { useEffect, useRef } from "react";
 import { useAppContext } from "./app-provider";
+import { Button } from "./ui/button";
+import { Pause, Play } from "lucide-react";
 
 interface AudioPlayerProps {
     audioUrl: string;
@@ -16,38 +18,46 @@ export function AudioPlayer({ audioUrl, audioId }: AudioPlayerProps) {
     const isPlaying = currentlyPlayingId === audioId;
 
     useEffect(() => {
-        if (audioRef.current) {
+        const audio = audioRef.current;
+        if (audio) {
             if (isPlaying) {
-                audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+                audio.play().catch(e => console.error("Audio play failed:", e));
             } else {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
+                audio.pause();
             }
         }
     }, [isPlaying]);
 
-    const handlePlay = () => {
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        const handleEnded = () => setCurrentlyPlayingId(null);
+        audio.addEventListener('ended', handleEnded);
+
+        return () => {
+            audio.removeEventListener('ended', handleEnded);
+        };
+    }, [setCurrentlyPlayingId]);
+
+    const handlePlayPause = () => {
         if (isPlaying) {
             setCurrentlyPlayingId(null); // Pause
         } else {
             setCurrentlyPlayingId(audioId); // Play
         }
     };
-    
-    const handleEnded = () => {
-        setCurrentlyPlayingId(null);
-    }
 
     return (
-        <audio
-            ref={audioRef}
-            src={audioUrl}
-            onPlay={handlePlay}
-            onEnded={handleEnded}
-            controls
-            className="w-full rounded-lg h-10"
-        >
-            Your browser does not support the audio element.
-        </audio>
+        <div className="flex items-center gap-2 w-full">
+            <Button onClick={handlePlayPause} size="icon" variant="outline" className="flex-shrink-0">
+                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+            </Button>
+            {/* The hidden audio element handles the actual playback */}
+            <audio ref={audioRef} src={audioUrl} className="hidden" />
+            <div className="w-full text-sm text-muted-foreground">
+                Click to play/pause
+            </div>
+        </div>
     );
 }

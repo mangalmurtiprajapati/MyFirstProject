@@ -174,7 +174,7 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
         </div>
       </CardContent>
       <CardFooter className="flex-col items-stretch gap-4 p-6">
-        {!isAuthenticated ? (
+        {!isAuthenticated || profile.email === "" ? (
             <Card className="text-center p-6 bg-muted/50">
                 <CardHeader>
                     <CardTitle>Login to Generate</CardTitle>
@@ -232,5 +232,3 @@ export function GenerateVoiceForm({ voices, voiceCategories }: GenerateVoiceForm
     </Card>
   );
 }
-
-    
