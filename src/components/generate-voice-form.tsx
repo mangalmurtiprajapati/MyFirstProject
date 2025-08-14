@@ -31,13 +31,14 @@ interface GenerateVoiceFormProps {
 }
 
 export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }: GenerateVoiceFormProps) {
-  const { history, addHistoryItem, toggleFavorite, creditState, isAuthenticated, profile } = useAppContext();
+  const { history, addHistoryItem, toggleFavorite, creditState, isAuthenticated } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [generatedItem, setGeneratedItem] = useState<HistoryItem | null>(null);
   const [dialogue, setDialogue] = useState("");
   const [voice, setVoice] = useState(preselectedVoice || (voices.length > 0 ? voiceCategories.male[0].value : ""));
   
   const { toast } = useToast();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (preselectedVoice) {
@@ -62,6 +63,18 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
         }
     }
   }, [history, generatedItem]);
+
+  const getAudioDuration = (url: string): Promise<number> => {
+      return new Promise((resolve) => {
+          const audio = new Audio(url);
+          audio.onloadedmetadata = () => {
+              resolve(Math.round(audio.duration));
+          };
+          audio.onerror = () => {
+              resolve(0); // If there's an error, return 0
+          }
+      });
+  }
   
   const handleGenerate = async () => {
     if (!dialogue) {
@@ -76,11 +89,13 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
     
     try {
       const result = await generateSyntheticVoice({ dialogue, voice });
+      const duration = await getAudioDuration(result.audioDataUri);
 
       const newItemData = {
         dialogue,
         voice: voices.find(v => v.value === voice)?.label || voice,
         audioUrl: result.audioDataUri,
+        duration: duration,
       };
       
       addHistoryItem(newItemData);
@@ -181,7 +196,7 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
         </div>
       </CardContent>
       <CardFooter className="flex-col items-stretch gap-4 p-6">
-        {!isAuthenticated || profile.email === "" ? (
+        {!isAuthenticated ? (
             <Card className="text-center p-6 bg-muted/50">
                 <CardHeader>
                     <CardTitle>Login to Generate</CardTitle>

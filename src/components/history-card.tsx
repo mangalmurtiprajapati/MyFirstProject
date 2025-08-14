@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Download, Trash2, Mic, Calendar } from "lucide-react";
+import { Star, Download, Trash2, Mic, Calendar, Clock } from "lucide-react";
 import { HistoryItem, useAppContext } from "./app-provider";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,11 @@ export function HistoryCard({ item }: HistoryCardProps) {
             <Mic className="h-4 w-4 flex-shrink-0" />
             <span className="truncate" title={item.voice}>{item.voice}</span>
           </span>
-          <span className="flex items-center gap-2 truncate">
+           <span className="flex items-center gap-2 truncate">
+            <Clock className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{item.duration}s</span>
+          </span>
+          <span className="flex items-center gap-2 truncate col-span-2">
             <Calendar className="h-4 w-4 flex-shrink-0" />
             <span className="truncate">{format(new Date(item.timestamp), "PPp")}</span>
           </span>

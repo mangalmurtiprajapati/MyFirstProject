@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, Mic, Sparkles, User as UserIcon } from "lucide-react";
@@ -27,6 +26,9 @@ const maleVoices: VoiceProfile[] = [
   { value: "zubenelgenubi", label: "Narrator Male", description: "A professional and engaging voice for storytelling.", tone: "Engaging", category: 'male', image: "https://placehold.co/600x400.png", hint: "storyteller man" },
   { value: "rasalgethi", label: "Raspy Male", description: "A gravelly and textured voice with character.", tone: "Raspy", category: 'male', image: "https://placehold.co/600x400.png", hint: "rugged man" },
   { value: "sadachbia", label: "Smooth Male", description: "A silky and smooth voice, ideal for commercials.", tone: "Smooth", category: 'male', image: "https://placehold.co/600x400.png", hint: "smooth talker" },
+  { value: "sadaltager", label: "Authoritative Male", description: "A confident and commanding voice.", tone: "Authoritative", category: 'male', image: "https://placehold.co/600x400.png", hint: "confident man" },
+  { value: "alnilam", label: "Friendly Male", description: "A warm and approachable voice.", tone: "Friendly", category: 'male', image: "https://placehold.co/600x400.png", hint: "friendly guy" },
+  { value: "orus", label: "Energetic Male", description: "An upbeat and lively voice.", tone: "Energetic", category: 'male', image: "https://placehold.co/600x400.png", hint: "energetic person" },
 ];
 
 const femaleVoices: VoiceProfile[] = [
@@ -35,6 +37,9 @@ const femaleVoices: VoiceProfile[] = [
   { value: "vindemiatrix", label: "Crisp Female", description: "A sharp and articulate voice for announcements.", tone: "Crisp", category: 'female', image: "https://placehold.co/600x400.png", hint: "professional woman" },
   { value: "achird", label: "Gentle Female", description: "A soft and soothing voice, perfect for meditation content.", tone: "Gentle", category: 'female', image: "https://placehold.co/600x400.png", hint: "gentle woman" },
   { value: "laomedeia", label: "Elegant Female", description: "A sophisticated and graceful voice for high-end branding.", tone: "Elegant", category: 'female', image: "https://placehold.co/600x400.png", hint: "elegant woman" },
+  { value: "leda", label: "Soft Female", description: "A gentle and quiet voice.", tone: "Soft", category: 'female', image: "https://placehold.co/600x400.png", hint: "soft spoken" },
+  { value: "sulafat", label: "Clear Female", description: "A bright and clear voice.", tone: "Clear", category: 'female', image: "https://placehold.co/600x400.png", hint: "clear speaking" },
+  { value: "umbriel", label: "Poetic Female", description: "A lyrical and expressive voice.", tone: "Poetic", category: 'female', image: "https://placehold.co/600x400.png", hint: "expressive artist" },
 ];
 
 const uniqueVoices: VoiceProfile[] = [
@@ -43,6 +48,13 @@ const uniqueVoices: VoiceProfile[] = [
   { value: "callirrhoe", label: "Galactic Herald", description: "An epic and booming voice from the cosmos.", tone: "Epic", category: 'unique', image: "https://placehold.co/600x400.png", hint: "cosmic being" },
   { value: "charon", label: "Underworld Guide", description: "A deep, mysterious, and echoing voice.", tone: "Ethereal", category: 'unique', image: "https://placehold.co/600x400.png", hint: "mythological guide" },
   { value: "fenrir", label: "Beastly Howl", description: "A rough, aggressive, and creature-like voice.", tone: "Aggressive", category: 'unique', image: "https://placehold.co/600x400.png", hint: "fierce wolf" },
+  { value: "despina", label: "Oceanic Spirit", description: "A flowing and serene voice.", tone: "Serene", category: 'unique', image: "https://placehold.co/600x400.png", hint: "ocean spirit" },
+  { value: "enceladus", label: "Ice Giant", description: "A booming and frosty voice.", tone: "Frosty", category: 'unique', image: "https://placehold.co/600x400.png", hint: "ice giant" },
+  { value: "erinome", label: "Cosmic Wanderer", description: "A wise and ancient voice.", tone: "Wise", category: 'unique', image: "https://placehold.co/600x400.png", hint: "cosmic wanderer" },
+  { value: "iapetus", label: "Ancient Titan", description: "A powerful and old voice.", tone: "Powerful", category: 'unique', image: "https://placehold.co/600x400.png", hint: "ancient titan" },
+  { value: "kore", label: "Whispering Nymph", description: "A soft and magical whisper.", tone: "Whisper", category: 'unique', image: "https://placehold.co/600x400.png", hint: "forest nymph" },
+  { value: "puck", label: "Mad Scientist (Gold)", description: "An eccentric and brilliant voice.", tone: "Eccentric", category: 'unique', image: "https://placehold.co/600x400.png", hint: "mad scientist" },
+  { value: "pulcherrima", label: "Celestial Singer", description: "A beautiful and melodic voice.", tone: "Melodic", category: 'unique', image: "https://placehold.co/600x400.png", hint: "celestial singer" },
 ];
 
 export default function VoicesPage() {

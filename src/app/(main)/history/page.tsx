@@ -19,7 +19,10 @@ export default function HistoryPage() {
   if (!isMounted) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Generation History</h1>
+        <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Generation History</h1>
+            <p className="text-muted-foreground">Your generated audio files will appear here.</p>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Skeleton className="h-[220px] w-full" />
             <Skeleton className="h-[220px] w-full" />
@@ -31,7 +34,10 @@ export default function HistoryPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Generation History</h1>
+       <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Generation History</h1>
+            <p className="text-muted-foreground">Your generated audio files will appear here.</p>
+        </div>
       {history.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {history.map((item) => (

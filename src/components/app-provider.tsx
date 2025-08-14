@@ -13,6 +13,7 @@ export interface HistoryItem {
   audioUrl: string;
   timestamp: string; // Storing as ISO string
   isFavorite: boolean;
+  duration: number; // Duration in seconds
 }
 
 export interface UserProfile {
@@ -92,23 +93,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     
-    const getHistoryKey = (userEmail: string | null) => {
-        return userEmail ? `appHistory_${userEmail}` : 'appHistory_guest';
-    }
+    const getHistoryKey = useCallback(() => {
+        if (isAuthenticated && profile.email) {
+            return `appHistory_${profile.email}`;
+        }
+        return 'appHistory_guest';
+    }, [isAuthenticated, profile.email]);
 
     useEffect(() => {
         const storedProfile = getFromLocalStorage<UserProfile | null>('userProfile', null);
         if (storedProfile && storedProfile.email) {
             setProfileState(storedProfile);
             setIsAuthenticated(true);
-            setHistory(getFromLocalStorage(getHistoryKey(storedProfile.email), []));
         } else {
-            setProfileState(guestProfile);
             setIsAuthenticated(false);
-            setHistory([]); // Guests have no history
+            setProfileState(guestProfile);
         }
         setIsMounted(true);
     }, []);
+
+    useEffect(() => {
+        if (isMounted) {
+            setHistory(getFromLocalStorage(getHistoryKey(), []));
+        }
+    }, [isMounted, getHistoryKey]);
+
 
     const setProfile = useCallback((newProfile: UserProfile) => {
         setProfileState(newProfile);
@@ -119,12 +128,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     const login = useCallback((user: UserProfile) => {
         setProfileState(user);
-        setIsAuthenticated(!!user.email);
-        if(user.email){
+        const authStatus = !!user.email;
+        setIsAuthenticated(authStatus);
+
+        if(authStatus){
             setInLocalStorage('userProfile', user);
-            setHistory(getFromLocalStorage(getHistoryKey(user.email), []));
+            // Load user-specific history, or guest history if it exists and user history is empty
+            const userHistoryKey = `appHistory_${user.email}`;
+            const guestHistory = getFromLocalStorage<HistoryItem[]>('appHistory_guest', []);
+            let finalHistory = getFromLocalStorage<HistoryItem[]>(userHistoryKey, []);
+
+            if (finalHistory.length === 0 && guestHistory.length > 0) {
+                 finalHistory = guestHistory;
+                 setInLocalStorage(userHistoryKey, finalHistory);
+                 localStorage.removeItem('appHistory_guest');
+            }
+             setHistory(finalHistory);
         } else {
-             setHistory([]); // Guest user
+             // Guest mode
+             setHistory(getFromLocalStorage('appHistory_guest', []));
         }
         router.push('/profile');
     }, [router]);
@@ -140,7 +162,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }, [router]);
 
     const addHistoryItem = useCallback((item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
-        if (!isAuthenticated || !profile.email) return;
         setHistory(prev => {
             const newHistoryItem: HistoryItem = {
                 ...item,
@@ -149,30 +170,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 isFavorite: false,
             };
             const updatedHistory = [newHistoryItem, ...prev];
-            setInLocalStorage(getHistoryKey(profile.email), updatedHistory);
+            setInLocalStorage(getHistoryKey(), updatedHistory);
             return updatedHistory;
         });
-    }, [isAuthenticated, profile.email]);
+    }, [getHistoryKey]);
 
     const toggleFavorite = useCallback((id: string) => {
-        if (!isAuthenticated || !profile.email) return;
         setHistory(prevHistory => {
             const updatedHistory = prevHistory.map(item =>
                 item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
             );
-            setInLocalStorage(getHistoryKey(profile.email), updatedHistory);
+            setInLocalStorage(getHistoryKey(), updatedHistory);
             return updatedHistory;
         });
-    }, [isAuthenticated, profile.email]);
+    }, [getHistoryKey]);
 
     const deleteHistoryItem = useCallback((id: string) => {
-        if (!isAuthenticated || !profile.email) return;
         setHistory(prev => {
             const updatedHistory = prev.filter(h => h.id !== id);
-            setInLocalStorage(getHistoryKey(profile.email), updatedHistory);
+            setInLocalStorage(getHistoryKey(), updatedHistory);
             return updatedHistory;
         });
-    }, [isAuthenticated, profile.email]);
+    }, [getHistoryKey]);
     
     const favorites = history.filter(item => item.isFavorite);
 

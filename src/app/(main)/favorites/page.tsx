@@ -19,7 +19,10 @@ export default function FavoritesPage() {
   if (!isMounted) {
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Favorite Voices</h1>
+            <div className="space-y-2">
+                <h1 className="text-3xl font-bold">Favorite Voices</h1>
+                <p className="text-muted-foreground">Your favorite voices will appear here.</p>
+            </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Skeleton className="h-[220px] w-full" />
                 <Skeleton className="h-[220px] w-full" />
@@ -31,7 +34,10 @@ export default function FavoritesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Favorite Voices</h1>
+       <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Favorite Voices</h1>
+            <p className="text-muted-foreground">Your favorite voices will appear here.</p>
+        </div>
       {favorites.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {favorites.map((item) => (
@@ -46,7 +52,7 @@ export default function FavoritesPage() {
             </div>
             <CardTitle className="mt-4">No Favorites Yet</CardTitle>
             <CardDescription>
-              Your favorite voices will appear here.
+              Star a generated voice to see it here.
             </CardDescription>
           </CardHeader>
           <CardContent>
