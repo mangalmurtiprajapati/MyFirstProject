@@ -11,9 +11,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import Link from "next/link"
 import { useAppContext } from "@/components/app-provider"
 import { useToast } from "@/hooks/use-toast"
-import { useState } from "react"
-import { Loader2, Eye, EyeOff } from "lucide-react"
+import { useState, useMemo } from "react"
+import { Loader2, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Progress } from "@/components/ui/progress"
+import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -34,6 +36,51 @@ const storeUser = (values: z.infer<typeof formSchema>) => {
     localStorage.setItem(`user_${email}`, JSON.stringify({ name, email, password }));
 }
 
+const PasswordStrengthIndicator = ({ password = "" }) => {
+    const strength = useMemo(() => {
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[^a-zA-Z0-9]/.test(password)) score++;
+        return score;
+    }, [password]);
+
+    const strengthLabel = ["", "Very Weak", "Weak", "Medium", "Strong", "Very Strong"][strength];
+    const strengthColor = [
+        "bg-transparent",
+        "bg-red-500",
+        "bg-orange-500",
+        "bg-yellow-500",
+        "bg-green-400",
+        "bg-green-500"
+    ][strength];
+
+    const checks = [
+        { label: "At least 8 characters", valid: password.length >= 8 },
+        { label: "Contains a lowercase letter", valid: /[a-z]/.test(password) },
+        { label: "Contains an uppercase letter", valid: /[A-Z]/.test(password) },
+        { label: "Contains a number", valid: /\d/.test(password) },
+        { label: "Contains a special character", valid: /[^a-zA-Z0-9]/.test(password) },
+    ]
+
+    return (
+        <div className="space-y-2">
+            <Progress value={strength * 20} className={cn("h-2 transition-all", strengthColor)} />
+            <p className="text-sm font-semibold">{strengthLabel}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                {checks.map(check => (
+                    <div key={check.label} className="flex items-center text-xs gap-2">
+                        {check.valid ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4 text-muted-foreground" />}
+                        <span className={cn(check.valid ? "text-foreground" : "text-muted-foreground")}>{check.label}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+}
+
 export default function RegisterPage() {
   const { login } = useAppContext()
   const { toast } = useToast()
@@ -48,7 +95,10 @@ export default function RegisterPage() {
       password: "",
       humanVerification: false,
     },
+    mode: "onChange",
   })
+  
+  const password = form.watch("password");
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setLoading(true)
@@ -143,6 +193,9 @@ export default function RegisterPage() {
                 </FormItem>
               )}
             />
+            
+            <PasswordStrengthIndicator password={password} />
+
              <FormField
               control={form.control}
               name="humanVerification"
@@ -181,3 +234,5 @@ export default function RegisterPage() {
     </Card>
   )
 }
+
+    
