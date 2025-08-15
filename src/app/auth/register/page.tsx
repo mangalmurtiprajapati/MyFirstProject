@@ -12,7 +12,7 @@ import Link from "next/link"
 import { useAppContext } from "@/components/app-provider"
 import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import { Loader2, Eye, EyeOff } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 
 const formSchema = z.object({
@@ -21,6 +21,12 @@ const formSchema = z.object({
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
   humanVerification: z.boolean().refine(val => val === true, { message: "Please verify you are human." }),
 })
+
+const getStoredUser = (email: string) => {
+    if (typeof window === 'undefined') return null;
+    const storedUser = localStorage.getItem(`user_${email}`);
+    return storedUser ? JSON.parse(storedUser) : null;
+}
 
 const storeUser = (values: z.infer<typeof formSchema>) => {
     if (typeof window === 'undefined') return;
@@ -32,6 +38,7 @@ export default function RegisterPage() {
   const { login } = useAppContext()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,8 +52,19 @@ export default function RegisterPage() {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setLoading(true)
-    // Simulate API call for registration
+
     setTimeout(() => {
+      // Check if user already exists
+      if (getStoredUser(values.email)) {
+          toast({
+              variant: "destructive",
+              title: "Registration Failed",
+              description: "An account with this email already exists. Please log in.",
+          });
+          setLoading(false);
+          return;
+      }
+
       // Store user details in localStorage
       storeUser(values);
 
@@ -107,8 +125,19 @@ export default function RegisterPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                   <FormControl>
+                    <div className="relative">
+                        <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                        <Button 
+                            type="button"
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                            onClick={() => setShowPassword(prev => !prev)}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
