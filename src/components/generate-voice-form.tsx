@@ -230,7 +230,7 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
             </Button>
         )}
         {generatedItem && (
-          <div className="mt-4 animate-in fade-in-50">
+          <div className="mt-4 w-full animate-in fade-in-50">
              <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-background to-secondary/30 p-4 space-y-4 shadow-lg">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
