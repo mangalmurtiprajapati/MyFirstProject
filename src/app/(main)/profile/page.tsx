@@ -16,9 +16,9 @@ export default function ProfilePage() {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
 
     const statItems = [
-        { icon: Mic, label: "Voices Generated", value: stats.voicesGenerated },
-        { icon: Star, label: "Favorites", value: stats.favoritesCount },
-        { icon: History, label: "History Items", value: stats.historyItems },
+        { icon: Mic, label: "Voices Generated", value: stats.voicesGenerated, href: "/history" },
+        { icon: Star, label: "Favorites", value: stats.favoritesCount, href: "/favorites" },
+        { icon: History, label: "History Items", value: stats.historyItems, href: "/history" },
     ];
 
     if (!isAuthenticated) {
@@ -92,11 +92,13 @@ export default function ProfilePage() {
                         </CardHeader>
                         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {statItems.map((stat, index) => (
-                                <Card key={index} className="flex flex-col items-center justify-center p-4 md:p-6 text-center bg-muted/50">
-                                    <stat.icon className="w-8 h-8 md:w-10 md:h-10 mb-2 text-primary" />
-                                    <p className="text-2xl font-bold">{stat.value}</p>
-                                    <p className="text-sm text-muted-foreground">{stat.label}</p>
-                                </Card>
+                                <Link href={stat.href} key={index}>
+                                    <Card className="flex flex-col items-center justify-center p-4 md:p-6 text-center bg-muted/50 h-full hover:bg-accent transition-colors hover:shadow-md">
+                                        <stat.icon className="w-8 h-8 md:w-10 md:h-10 mb-2 text-primary" />
+                                        <p className="text-2xl font-bold">{stat.value}</p>
+                                        <p className="text-sm text-muted-foreground">{stat.label}</p>
+                                    </Card>
+                                </Link>
                             ))}
                         </CardContent>
                     </Card>
