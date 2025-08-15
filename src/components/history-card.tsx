@@ -20,7 +20,7 @@ export function HistoryCard({ item }: HistoryCardProps) {
     <Card className="w-full shadow-lg border-border/60 bg-card/80 backdrop-blur-sm transition-all hover:shadow-xl flex flex-col">
       <CardHeader className="flex-grow pb-4">
         <CardTitle className="text-lg font-bold leading-tight">
-          <p className="line-clamp-2" title={item.dialogue}>"{item.dialogue}"</p>
+          <p className="line-clamp-2" title={item.dialogue}>{item.title}</p>
         </CardTitle>
         <CardDescription className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 pt-3 text-xs">
           <span className="flex items-center gap-2 truncate">

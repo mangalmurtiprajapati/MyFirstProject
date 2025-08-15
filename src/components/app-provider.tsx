@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 
 export interface HistoryItem {
   id: string;
+  title: string;
   dialogue: string;
   voice: string;
   audioUrl: string;

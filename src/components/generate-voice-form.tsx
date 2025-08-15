@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { generateSyntheticVoice } from "@/ai/flows/generate-synthetic-voice";
+import { generateTitle } from '@/ai/flows/generate-title';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -88,10 +89,12 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
     setGeneratedItem(null);
     
     try {
+      const { title } = await generateTitle({ dialogue });
       const result = await generateSyntheticVoice({ dialogue, voice });
       const duration = await getAudioDuration(result.audioDataUri);
 
       const newItemData = {
+        title,
         dialogue,
         voice: voices.find(v => v.value === voice)?.label || voice,
         audioUrl: result.audioDataUri,
@@ -234,7 +237,7 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
                         <div className="p-2 bg-primary/10 rounded-full border border-primary/20 flex-shrink-0">
                             <Music4 className="text-primary h-5 w-5" />
                         </div>
-                        <h3 className="font-bold text-lg md:text-xl text-foreground truncate">Voice Generated</h3>
+                        <h3 className="font-bold text-lg md:text-xl text-foreground truncate">{generatedItem.title}</h3>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => toggleFavorite(generatedItem.id)} title={generatedItem.isFavorite ? "Remove from favorites" : "Add to favorites"}>
                         <Star className={cn("h-6 w-6 transition-all", generatedItem.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground hover:text-yellow-400")} />
