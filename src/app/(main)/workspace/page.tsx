@@ -88,16 +88,18 @@ function WorkspaceComponent() {
             <TabsTrigger value="generate" className="text-base rounded-lg">Generate Voice</TabsTrigger>
             <TabsTrigger value="clone" className="text-base rounded-lg">Clone Voice</TabsTrigger>
           </TabsList>
-          <TabsContent value="generate" className="mt-6">
-            <GenerateVoiceForm 
-              voices={voices} 
-              voiceCategories={{male: maleVoices, female: femaleVoices, unique: uniqueVoices}}
-              preselectedVoice={selectedVoice}
-            />
-          </TabsContent>
-          <TabsContent value="clone" className="mt-6">
-            <CloneVoiceForm onVoiceCloned={addClonedVoice} allVoices={allVoices} />
-          </TabsContent>
+          <div className="w-full max-w-4xl">
+            <TabsContent value="generate" className="mt-6">
+              <GenerateVoiceForm 
+                voices={voices} 
+                voiceCategories={{male: maleVoices, female: femaleVoices, unique: uniqueVoices}}
+                preselectedVoice={selectedVoice}
+              />
+            </TabsContent>
+            <TabsContent value="clone" className="mt-6">
+              <CloneVoiceForm onVoiceCloned={addClonedVoice} allVoices={allVoices} />
+            </TabsContent>
+          </div>
         </Tabs>
         </motion.div>
         
