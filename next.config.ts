@@ -8,9 +8,6 @@ const pwa = withPWAInit({
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
   swcMinify: true,
-  workboxOptions: {
-    disableDevLogs: true,
-  },
 });
 
 
