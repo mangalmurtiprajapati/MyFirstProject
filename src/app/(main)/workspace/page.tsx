@@ -75,20 +75,22 @@ function WorkspaceComponent() {
   const recentHistory = history.slice(0, 3);
 
   return (
-    <div className="flex w-full flex-col items-center gap-8">
-        <CreditUsageCard />
+    <div className="space-y-8">
+        <div className="w-full max-w-4xl mx-auto">
+            <CreditUsageCard />
+        </div>
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-4xl"
+            className="w-full max-w-4xl mx-auto"
         >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-muted/50 border-2 border-border/60 h-12 rounded-xl">
             <TabsTrigger value="generate" className="text-base rounded-lg">Generate Voice</TabsTrigger>
             <TabsTrigger value="clone" className="text-base rounded-lg">Clone Voice</TabsTrigger>
           </TabsList>
-          <div className="w-full max-w-4xl">
+          <div className="w-full">
             <TabsContent value="generate" className="mt-6">
               <GenerateVoiceForm 
                 voices={voices} 
@@ -104,7 +106,7 @@ function WorkspaceComponent() {
         </motion.div>
         
         {recentHistory.length > 0 && (
-            <div className="w-full max-w-4xl mt-8">
+            <div className="w-full max-w-4xl mt-8 mx-auto">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold flex items-center gap-2"><History className="h-6 w-6"/>Recent History</h2>
                     <Button variant="link" asChild>
