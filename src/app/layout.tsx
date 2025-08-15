@@ -15,6 +15,7 @@ const fontSans = FontSans({
 export const metadata: Metadata = {
   title: 'VocalForge',
   description: 'AI-powered voice cloning and generation.',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
