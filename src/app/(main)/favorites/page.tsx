@@ -18,46 +18,54 @@ export default function FavoritesPage() {
 
   if (!isMounted) {
     return (
-        <div className="space-y-6">
-            <div className="space-y-2">
-                <h1 className="text-3xl font-bold">Favorite Voices</h1>
-                <p className="text-muted-foreground">Your favorite voices will appear here.</p>
+        <div className="space-y-8">
+            <div className="flex items-center gap-4">
+                <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                    <Star className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                    <h1 className="text-3xl font-bold">Favorite Voices</h1>
+                    <p className="text-muted-foreground">Your starred creations will appear here.</p>
+                </div>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Skeleton className="h-[220px] w-full" />
-                <Skeleton className="h-[220px] w-full" />
-                <Skeleton className="h-[220px] w-full" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <Skeleton className="h-[230px] w-full" />
+                <Skeleton className="h-[230px] w-full" />
+                <Skeleton className="h-[230px] w-full" />
+                <Skeleton className="h-[230px] w-full" />
             </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-       <div className="space-y-2">
-            <h1 className="text-3xl font-bold">Favorite Voices</h1>
-            <p className="text-muted-foreground">Your favorite voices will appear here.</p>
+    <div className="space-y-8">
+        <div className="flex items-center gap-4">
+            <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                <Star className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+                <h1 className="text-3xl font-bold">Favorite Voices</h1>
+                <p className="text-muted-foreground">Your starred creations will appear here.</p>
+            </div>
         </div>
       {favorites.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {favorites.map((item) => (
             <HistoryCard key={item.id} item={item} />
           ))}
         </div>
       ) : (
-        <Card className="flex flex-col items-center justify-center text-center p-12 min-h-[400px]">
-          <CardHeader>
-            <div className="p-4 bg-muted rounded-full mx-auto">
-              <Star className="w-12 h-12 text-muted-foreground" />
+        <Card className="flex flex-col items-center justify-center text-center p-12 min-h-[400px] border-dashed shadow-none">
+          <CardHeader className="space-y-4">
+            <div className="p-5 bg-muted rounded-full mx-auto border-2 border-dashed">
+              <Star className="w-16 h-16 text-muted-foreground/60" />
             </div>
-            <CardTitle className="mt-4">No Favorites Yet</CardTitle>
-            <CardDescription>
-              Star a generated voice to see it here.
+            <CardTitle className="text-2xl mt-4">No Favorites Yet</CardTitle>
+            <CardDescription className="max-w-xs mx-auto">
+              Go to your history and click the star on any generated voice to save it here for easy access.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            
-          </CardContent>
         </Card>
       )}
     </div>
