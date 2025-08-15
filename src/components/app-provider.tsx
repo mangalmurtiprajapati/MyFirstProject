@@ -121,32 +121,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const setProfile = useCallback((newProfile: UserProfile) => {
         setProfileState(newProfile);
-        if (isAuthenticated && profile.email) {
+        if (isAuthenticated && newProfile.email) {
             setInLocalStorage('userProfile', newProfile);
         }
-    }, [isAuthenticated, profile.email]);
+    }, [isAuthenticated]);
     
     const login = useCallback((user: UserProfile) => {
-        setProfileState(user);
-        const authStatus = !!user.email;
-        setIsAuthenticated(authStatus);
-
-        if(authStatus){
-            setInLocalStorage('userProfile', user);
-            // Load user-specific history, or guest history if it exists and user history is empty
+        const isAuthenticating = !!user.email;
+        
+        if(isAuthenticating){
             const userHistoryKey = `appHistory_${user.email}`;
-            const guestHistory = getFromLocalStorage<HistoryItem[]>('appHistory_guest', []);
-            let finalHistory = getFromLocalStorage<HistoryItem[]>(userHistoryKey, []);
+            const guestHistoryKey = 'appHistory_guest';
+            
+            const guestHistory = getFromLocalStorage<HistoryItem[]>(guestHistoryKey, []);
+            let userHistory = getFromLocalStorage<HistoryItem[]>(userHistoryKey, []);
 
-            if (finalHistory.length === 0 && guestHistory.length > 0) {
-                 finalHistory = guestHistory;
-                 setInLocalStorage(userHistoryKey, finalHistory);
-                 localStorage.removeItem('appHistory_guest');
+            if (guestHistory.length > 0) {
+                 userHistory = [...guestHistory, ...userHistory];
+                 // Remove duplicates, keeping the first occurrence
+                 userHistory = userHistory.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i)
+                 setInLocalStorage(userHistoryKey, userHistory);
+                 localStorage.removeItem(guestHistoryKey);
             }
-             setHistory(finalHistory);
+            
+            setHistory(userHistory);
+            setProfileState(user);
+            setIsAuthenticated(true);
+            setInLocalStorage('userProfile', user);
         } else {
              // Guest mode
              setHistory(getFromLocalStorage('appHistory_guest', []));
+             setProfileState(guestProfile);
+             setIsAuthenticated(false);
+             localStorage.removeItem('userProfile');
         }
         router.push('/profile');
     }, [router]);
@@ -157,18 +164,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setHistory([]);
         if (typeof window !== 'undefined') {
             localStorage.removeItem('userProfile');
+            // Optional: clear guest history on logout as well
+            // localStorage.removeItem('appHistory_guest');
         }
         router.push('/home');
     }, [router]);
 
     const addHistoryItem = useCallback((item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
+        const newHistoryItem: HistoryItem = {
+            ...item,
+            id: new Date().toISOString() + Math.random(),
+            timestamp: new Date().toISOString(),
+            isFavorite: false,
+        };
         setHistory(prev => {
-            const newHistoryItem: HistoryItem = {
-                ...item,
-                id: new Date().toISOString() + Math.random(),
-                timestamp: new Date().toISOString(),
-                isFavorite: false,
-            };
             const updatedHistory = [newHistoryItem, ...prev];
             setInLocalStorage(getHistoryKey(), updatedHistory);
             return updatedHistory;

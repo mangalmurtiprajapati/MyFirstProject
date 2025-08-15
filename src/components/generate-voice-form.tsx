@@ -31,7 +31,7 @@ interface GenerateVoiceFormProps {
 }
 
 export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }: GenerateVoiceFormProps) {
-  const { history, addHistoryItem, toggleFavorite, creditState, isAuthenticated } = useAppContext();
+  const { history, addHistoryItem, toggleFavorite, creditState, isAuthenticated, profile } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [generatedItem, setGeneratedItem] = useState<HistoryItem | null>(null);
   const [dialogue, setDialogue] = useState("");

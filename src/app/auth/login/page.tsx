@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
+import { GoogleIcon } from "@/components/icons/google-icon"
+import { FacebookIcon } from "@/components/icons/facebook-icon"
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
@@ -42,7 +44,6 @@ export default function LoginPage() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setLoading(true)
     
-    // Simulate API call and credential validation
     setTimeout(() => {
       const storedUser = getStoredUser(values.email);
       
@@ -80,7 +81,7 @@ export default function LoginPage() {
     });
     toast({
         title: "Logged in as Guest",
-        description: "You are browsing as a guest. History and favorites will not be saved."
+        description: "You are browsing as a guest. Your creations won't be saved after this session."
     });
   }
 
@@ -137,8 +138,14 @@ export default function LoginPage() {
             </div>
 
             <div className="w-full grid grid-cols-2 gap-2">
-                <Button variant="outline" disabled>Continue w/ Google</Button>
-                <Button variant="outline" disabled>Continue w/ Facebook</Button>
+                <Button variant="outline" disabled>
+                    <GoogleIcon className="mr-2 h-5 w-5" />
+                    Google
+                </Button>
+                <Button variant="outline" disabled>
+                    <FacebookIcon className="mr-2 h-5 w-5" />
+                    Facebook
+                </Button>
             </div>
             <Button variant="secondary" className="w-full" onClick={handleGuestLogin}>Continue as Guest</Button>
 
