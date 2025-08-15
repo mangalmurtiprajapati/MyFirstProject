@@ -22,6 +22,8 @@ import { toast } from "@/hooks/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
+import { useAppContext } from "@/components/app-provider"
+import { useEffect } from "react"
 
 const profileFormSchema = z.object({
   username: z
@@ -61,6 +63,7 @@ const defaultNotificationValues: Partial<NotificationsFormValues> = {
 
 export default function SettingsPage() {
   const { setTheme } = useTheme()
+  const { profile, isAuthenticated } = useAppContext()
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -72,6 +75,17 @@ export default function SettingsPage() {
       resolver: zodResolver(notificationsFormSchema),
       defaultValues: defaultNotificationValues,
   })
+
+  useEffect(() => {
+    if(isAuthenticated && profile.email){
+        profileForm.reset({
+            username: profile.name,
+            email: profile.email,
+        })
+    } else {
+        profileForm.reset(defaultProfileValues)
+    }
+  }, [isAuthenticated, profile, profileForm])
 
   function onProfileSubmit(data: ProfileFormValues) {
     toast({
@@ -128,7 +142,7 @@ export default function SettingsPage() {
                             <FormItem>
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                <Input type="email" placeholder="Your email" {...field} />
+                                <Input type="email" placeholder="Your email" {...field} disabled={isAuthenticated} />
                                 </FormControl>
                                 <FormDescription>
                                     We will never share your email with anyone else.
@@ -211,7 +225,7 @@ export default function SettingsPage() {
                 <CardTitle>Theme</CardTitle>
                 <CardDescription>Select a theme for the application.</CardDescription>
             </CardHeader>
-            <CardContent className="flex gap-4">
+            <CardContent className="flex flex-col sm:flex-row gap-4">
                  <Button variant="outline" onClick={() => setTheme("light")} className="flex-1">
                     <Sun className="mr-2" /> Light
                 </Button>
