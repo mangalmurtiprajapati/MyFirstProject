@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GenerateVoiceForm, Voice } from "@/components/generate-voice-form";
 import { CloneVoiceForm } from "@/components/clone-voice-form";
@@ -83,7 +83,7 @@ function GeneratedResultCard({ item }: { item: HistoryItem }) {
     )
 }
 
-function WorkspaceComponent() {
+export default function WorkspacePage() {
   const searchParams = useSearchParams();
   const selectedVoice = searchParams.get('voice');
   
@@ -183,13 +183,5 @@ function WorkspaceComponent() {
             </div>
         )}
     </div>
-  );
-}
-
-export default function WorkspacePage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <WorkspaceComponent />
-    </Suspense>
   );
 }
