@@ -30,7 +30,7 @@ interface AppContextType {
   favorites: HistoryItem[];
   toggleFavorite: (id: string) => void;
   deleteHistoryItem: (id: string) => void;
-  addHistoryItem: (item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => void;
+  addHistoryItem: (item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => HistoryItem;
   profile: UserProfile;
   setProfile: (newProfile: UserProfile) => void;
   stats: {
@@ -115,10 +115,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         if (isMounted) {
-            const historyKey = isAuthenticated && profile.email ? `appHistory_${profile.email}` : 'appHistory_guest';
+            const historyKey = getHistoryKey();
             setHistory(getFromLocalStorage(historyKey, []));
         }
-    }, [isMounted, isAuthenticated, profile.email]);
+    }, [isMounted, getHistoryKey]);
 
 
     const setProfile = useCallback((newProfile: UserProfile) => {
@@ -186,6 +186,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             setInLocalStorage(getHistoryKey(), updatedHistory);
             return updatedHistory;
         });
+        return newHistoryItem;
     }, [getHistoryKey]);
 
     const toggleFavorite = useCallback((id: string) => {

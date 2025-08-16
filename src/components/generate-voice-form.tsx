@@ -39,7 +39,6 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
   const [voice, setVoice] = useState(preselectedVoice || (voices.length > 0 ? voiceCategories.male[0].value : ""));
   
   const { toast } = useToast();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (preselectedVoice) {
@@ -78,6 +77,7 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
           audio.onerror = () => {
               resolve(0); // If there's an error, return 0
           }
+          audio.src = url;
       });
   }
   
@@ -97,7 +97,6 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
       const result = await generateSyntheticVoice({ dialogue, voice });
       const duration = await getAudioDuration(result.audioDataUri);
 
-      // This is a temporary object structure. The real one is created in addHistoryItem.
       const newItemData = {
         title,
         dialogue,
@@ -106,10 +105,8 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
         duration: duration,
       };
       
-      addHistoryItem(newItemData);
-
-      // The useEffect listening to `history` will set the generatedItem state
-      // with the full HistoryItem object once it's added.
+      const newHistoryItem = addHistoryItem(newItemData);
+      setGeneratedItem(newHistoryItem);
 
       toast({
         title: "Voice Generated!",
@@ -136,18 +133,6 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    // This effect runs after a generation to find the newly added item in the history
-    // and set it to the `generatedItem` state for display.
-    if (!loading && history.length > 0) {
-      // Find the latest item in history that matches the generated dialogue
-      const latestItem = history.find(item => item.dialogue === dialogue);
-      if (latestItem) {
-        setGeneratedItem(latestItem);
-      }
-    }
-  }, [history, loading, dialogue]);
   
   return (
     <div className="space-y-6">
@@ -260,7 +245,7 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
                 </div>
                 <AudioPlayer audioUrl={generatedItem.audioUrl} audioId={generatedItem.id} />
                 <Button asChild variant="outline" className="w-full h-11 text-base font-semibold">
-                    <a href={generatedItem.audioUrl} download="vocalforge_voice.wav">
+                    <a href={generatedItem.audioUrl} download={`${generatedItem.voice.replace(/\\s+/g, '_')}_${generatedItem.id}.wav`}>
                         <Download className="mr-2 h-5 w-5" />
                         Download Now
                     </a>
