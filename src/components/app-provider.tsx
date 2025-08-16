@@ -189,7 +189,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return newHistoryItem;
     };
 
-    const toggleFavorite = useCallback((id: string) => {
+    const toggleFavorite = (id: string) => {
         setHistory(prevHistory => {
             const updatedHistory = prevHistory.map(item =>
                 item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
@@ -197,15 +197,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
             setInLocalStorage(getHistoryKey(), updatedHistory);
             return updatedHistory;
         });
-    }, [getHistoryKey]);
+    };
 
-    const deleteHistoryItem = useCallback((id: string) => {
+    const deleteHistoryItem = (id: string) => {
         setHistory(prev => {
             const updatedHistory = prev.filter(h => h.id !== id);
             setInLocalStorage(getHistoryKey(), updatedHistory);
             return updatedHistory;
         });
-    }, [getHistoryKey]);
+    };
     
     const favorites = history.filter(item => item.isFavorite);
 

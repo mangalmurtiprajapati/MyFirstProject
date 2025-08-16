@@ -11,11 +11,10 @@ import { useAppContext, HistoryItem } from "@/components/app-provider";
 import { HistoryCard } from "@/components/history-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { History, LayoutGrid } from "lucide-react";
+import { History, LayoutGrid, Download, Music4, Star } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { AudioPlayer } from "@/components/audio-player";
 import { cn } from "@/lib/utils";
-import { Download, Music4, Star } from "lucide-react";
 
 const maleVoices: Voice[] = [
   { value: "algenib", label: "Deep Male" },
@@ -56,7 +55,8 @@ const uniqueVoices: Voice[] = [
 
 const allVoices = [...maleVoices, ...femaleVoices, ...uniqueVoices];
 
-function GeneratedResultCard({ item, onToggleFavorite }: { item: HistoryItem, onToggleFavorite: (id: string) => void }) {
+function GeneratedResultCard({ item }: { item: HistoryItem }) {
+    const { toggleFavorite } = useAppContext();
     return (
         <div className="mt-4 w-full animate-in fade-in-50">
             <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-background to-secondary/30 p-4 space-y-4 shadow-lg">
@@ -67,7 +67,7 @@ function GeneratedResultCard({ item, onToggleFavorite }: { item: HistoryItem, on
                         </div>
                         <h3 className="font-bold text-lg md:text-xl text-foreground truncate">{item.title}</h3>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => onToggleFavorite(item.id)} title={item.isFavorite ? "Remove from favorites" : "Add to favorites"}>
+                    <Button variant="ghost" size="icon" onClick={() => toggleFavorite(item.id)} title={item.isFavorite ? "Remove from favorites" : "Add to favorites"}>
                         <Star className={cn("h-6 w-6 transition-all", item.isFavorite ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground hover:text-yellow-400")} />
                     </Button>
                 </div>
@@ -89,8 +89,9 @@ function WorkspaceComponent() {
   
   const [voices, setVoices] = useState<Voice[]>(allVoices);
   const [activeTab, setActiveTab] = useState("generate");
-  const { history, toggleFavorite } = useAppContext();
-  const [generatedItem, setGeneratedItem] = useState<HistoryItem | null>(null);
+  const { history, currentlyPlayingId, setCurrentlyPlayingId, deleteHistoryItem } = useAppContext();
+  
+  const mostRecentlyGeneratedItem = history.find(h => h.id === currentlyPlayingId);
 
   useEffect(() => {
     if (selectedVoice) {
@@ -98,89 +99,89 @@ function WorkspaceComponent() {
     }
   }, [selectedVoice]);
 
-  // When history updates (e.g. favorite toggled), find the matching item and update our local state
-  useEffect(() => {
-    if (generatedItem) {
-        const updatedItemInHistory = history.find(h => h.id === generatedItem.id);
-        if (updatedItemInHistory) {
-            setGeneratedItem(updatedItemInHistory);
-        } else {
-            // It was deleted from history, so remove it from the workspace view.
-            setGeneratedItem(null);
-        }
-    }
-  }, [history, generatedItem]);
+  const handleGenerationComplete = (newItem: HistoryItem) => {
+    setCurrentlyPlayingId(newItem.id);
+  };
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setCurrentlyPlayingId(null);
+  }
 
   const addClonedVoice = (newVoice: Voice) => {
-    // Add to the main list if it's not already there
     if (!voices.some(v => v.value === newVoice.value)) {
         setVoices(prevVoices => [...prevVoices, newVoice]);
     }
     setActiveTab("generate");
   };
   
-  const recentHistory = history.slice(0, 3);
-
+  const recentHistory = history.filter(item => item.id !== currentlyPlayingId).slice(0, 3);
+  
   return (
     <div className="space-y-8">
         <div className="w-full max-w-4xl mx-auto">
             <CreditUsageCard />
+        </div>
+
+        <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-4xl mx-auto"
+        >
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50 border-2 border-border/60 h-12 rounded-xl">
+                <TabsTrigger value="generate" className="text-base rounded-lg">Generate Voice</TabsTrigger>
+                <TabsTrigger value="clone" className="text-base rounded-lg">Clone Voice</TabsTrigger>
+            </TabsList>
+            <div className="w-full mt-6">
+                <TabsContent value="generate">
+                <GenerateVoiceForm 
+                    voices={voices} 
+                    voiceCategories={{male: maleVoices, female: femaleVoices, unique: uniqueVoices}}
+                    preselectedVoice={selectedVoice}
+                    onGenerationComplete={handleGenerationComplete}
+                />
+                </TabsContent>
+                <TabsContent value="clone">
+                <CloneVoiceForm onVoiceCloned={addClonedVoice} allVoices={allVoices} />
+                </TabsContent>
+            </div>
+            </Tabs>
+        </motion.div>
+        
+        {activeTab === 'generate' && mostRecentlyGeneratedItem && (
              <motion.div
-                key={activeTab}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mt-8"
-             >
-                <Tabs value={activeTab} onValueChange={(value) => {setActiveTab(value); setGeneratedItem(null);}} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 bg-muted/50 border-2 border-border/60 h-12 rounded-xl">
-                    <TabsTrigger value="generate" className="text-base rounded-lg">Generate Voice</TabsTrigger>
-                    <TabsTrigger value="clone" className="text-base rounded-lg">Clone Voice</TabsTrigger>
-                </TabsList>
-                <div className="w-full mt-6">
-                    <TabsContent value="generate">
-                    <GenerateVoiceForm 
-                        voices={voices} 
-                        voiceCategories={{male: maleVoices, female: femaleVoices, unique: uniqueVoices}}
-                        preselectedVoice={selectedVoice}
-                        onGenerationComplete={setGeneratedItem}
-                    />
-                    </TabsContent>
-                    <TabsContent value="clone">
-                    <CloneVoiceForm onVoiceCloned={addClonedVoice} allVoices={allVoices} />
-                    </TabsContent>
-                </div>
-                </Tabs>
-            </motion.div>
-            
-            {activeTab === 'generate' && generatedItem && (
-                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="w-full max-w-4xl mx-auto"
-                >
-                    <GeneratedResultCard item={generatedItem} onToggleFavorite={toggleFavorite} />
-                 </motion.div>
-            )}
+                className="w-full max-w-4xl mx-auto"
+            >
+                <GeneratedResultCard item={mostRecentlyGeneratedItem} />
+             </motion.div>
+        )}
 
-            {recentHistory.length > 0 && (
-                <div className="w-full max-w-4xl mt-8 mx-auto">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold flex items-center gap-2"><History className="h-6 w-6"/>Recent History</h2>
-                        <Button variant="link" asChild>
-                            <Link href="/history">
-                                View All <LayoutGrid className="ml-2 h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </div>
+        {history.length > 0 && (
+            <div className="w-full max-w-4xl mt-8 mx-auto">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-bold flex items-center gap-2"><History className="h-6 w-6"/>Recent History</h2>
+                    <Button variant="link" asChild>
+                        <Link href="/history">
+                            View All <LayoutGrid className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </div>
+                {recentHistory.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {recentHistory.map((item) => (
                             <HistoryCard key={item.id} item={item} />
                         ))}
                     </div>
-                </div>
-            )}
-        </div>
+                ) : (
+                    <p className="text-muted-foreground text-center py-4">No other history items yet.</p>
+                )}
+            </div>
+        )}
     </div>
   );
 }
