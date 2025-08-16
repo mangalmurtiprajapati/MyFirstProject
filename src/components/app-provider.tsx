@@ -174,7 +174,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         router.push('/home');
     }, [router]);
 
-    const addHistoryItem = useCallback((item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
+    const addHistoryItem = (item: Omit<HistoryItem, 'id' | 'timestamp' | 'isFavorite'>) => {
         const newHistoryItem: HistoryItem = {
             ...item,
             id: new Date().toISOString() + Math.random(),
@@ -187,7 +187,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             return updatedHistory;
         });
         return newHistoryItem;
-    }, [getHistoryKey]);
+    };
 
     const toggleFavorite = useCallback((id: string) => {
         setHistory(prevHistory => {
