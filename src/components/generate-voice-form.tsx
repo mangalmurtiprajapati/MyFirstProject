@@ -50,9 +50,12 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
   useEffect(() => {
     const allVoiceValues = voices.map(v => v.value);
     if (voices.length > 0 && !allVoiceValues.includes(voice)) {
-      setVoice(voices[voices.length - 1].value);
+        const clonedVoices = voices.filter(v => !voiceCategories.male.some(male => male.value === v.value) && !voiceCategories.female.some(female => female.value === v.value) && !voiceCategories.unique.some(unique => unique.value === v.value));
+        if (clonedVoices.length > 0) {
+            setVoice(clonedVoices[clonedVoices.length - 1].value);
+        }
     }
-  }, [voices, voice]);
+  }, [voices, voice, voiceCategories]);
 
   useEffect(() => {
     if (generatedItem) {
@@ -139,99 +142,103 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
   }, [history, loading, dialogue]);
   
   return (
-    <Card className="w-full shadow-xl border-border/60 bg-card/80 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Generate a Synthetic Voice</CardTitle>
-        <CardDescription>Select a voice and enter some dialogue to convert it into speech.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-            <Label htmlFor="voice" className="text-lg">Voice</Label>
-            <Select onValueChange={setVoice} value={voice}>
-              <SelectTrigger id="voice" className="h-12 text-base">
-                <SelectValue placeholder="Select a voice" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel className="flex items-center gap-2"><User className="h-4 w-4" />Male Voices</SelectLabel>
-                  {voiceCategories.male.map((v) => (
-                    <SelectItem key={v.value} value={v.value}>
-                      {v.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-                <SelectGroup>
-                  <SelectLabel className="flex items-center gap-2"><User className="h-4 w-4" />Female Voices</SelectLabel>
-                  {voiceCategories.female.map((v) => (
-                    <SelectItem key={v.value} value={v.value}>
-                      {v.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-                 <SelectGroup>
-                  <SelectLabel className="flex items-center gap-2"><SparklesIcon className="h-4 w-4" />Unique Voices</SelectLabel>
-                  {voiceCategories.unique.map((v) => (
-                    <SelectItem key={v.value} value={v.value}>
-                      {v.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-                <SelectGroup>
-                  <SelectLabel className="flex items-center gap-2"><Mic className="h-4 w-4" />Cloned Voices</SelectLabel>
-                  {voices.filter(v => !voiceCategories.male.includes(v) && !voiceCategories.female.includes(v) && !voiceCategories.unique.includes(v)).map((v) => (
-                    <SelectItem key={v.value} value={v.value}>
-                      {v.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-        <div className="space-y-2">
-          <Label htmlFor="dialogue" className="text-lg">Dialogue</Label>
-          <Textarea
-            id="dialogue"
-            value={dialogue}
-            onChange={(e) => setDialogue(e.target.value)}
-            placeholder="Enter your dialogue here..."
-            className="min-h-[120px] text-base"
-          />
-        </div>
-      </CardContent>
-      <CardFooter className="flex-col items-stretch gap-4 p-6">
-        {!isAuthenticated ? (
-            <Card className="text-center p-6 bg-muted/50">
-                <CardHeader>
-                    <CardTitle>Login to Generate</CardTitle>
-                    <CardDescription>You need to be logged in to generate voices.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Button asChild>
-                        <Link href="/auth/login">
-                            <LogIn className="mr-2 h-4 w-4" />
-                            Login to Continue
-                        </Link>
-                    </Button>
-                </CardContent>
-            </Card>
-        ) : (
-            <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice || creditState.limitReached} size="lg" className="h-14 text-lg font-bold">
-            {loading ? (
-                <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Generating...
-                </>
+    <div className="space-y-6">
+        <Card className="w-full shadow-xl border-border/60 bg-card/80 backdrop-blur-sm">
+        <CardHeader>
+            <CardTitle className="text-2xl font-bold">Generate a Synthetic Voice</CardTitle>
+            <CardDescription>Select a voice and enter some dialogue to convert it into speech.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="voice" className="text-lg">Voice</Label>
+                <Select onValueChange={setVoice} value={voice}>
+                <SelectTrigger id="voice" className="h-12 text-base">
+                    <SelectValue placeholder="Select a voice" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                    <SelectLabel className="flex items-center gap-2"><User className="h-4 w-4" />Male Voices</SelectLabel>
+                    {voiceCategories.male.map((v) => (
+                        <SelectItem key={v.value} value={v.value}>
+                        {v.label}
+                        </SelectItem>
+                    ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                    <SelectLabel className="flex items-center gap-2"><User className="h-4 w-4" />Female Voices</SelectLabel>
+                    {voiceCategories.female.map((v) => (
+                        <SelectItem key={v.value} value={v.value}>
+                        {v.label}
+                        </SelectItem>
+                    ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                    <SelectLabel className="flex items-center gap-2"><SparklesIcon className="h-4 w-4" />Unique Voices</SelectLabel>
+                    {voiceCategories.unique.map((v) => (
+                        <SelectItem key={v.value} value={v.value}>
+                        {v.label}
+                        </SelectItem>
+                    ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                    <SelectLabel className="flex items-center gap-2"><Mic className="h-4 w-4" />Cloned Voices</SelectLabel>
+                    {voices.filter(v => !voiceCategories.male.some(male => male.value === v.value) && !voiceCategories.female.some(female => female.value === v.value) && !voiceCategories.unique.some(unique => unique.value === v.value)).map((v) => (
+                        <SelectItem key={v.value} value={v.value}>
+                        {v.label}
+                        </SelectItem>
+                    ))}
+                    </SelectGroup>
+                </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-2">
+            <Label htmlFor="dialogue" className="text-lg">Dialogue</Label>
+            <Textarea
+                id="dialogue"
+                value={dialogue}
+                onChange={(e) => setDialogue(e.target.value)}
+                placeholder="Enter your dialogue here..."
+                className="min-h-[120px] text-base"
+            />
+            </div>
+        </CardContent>
+        <CardFooter className="flex-col items-stretch gap-4 p-6">
+            {!isAuthenticated ? (
+                <Card className="text-center p-6 bg-muted/50">
+                    <CardHeader>
+                        <CardTitle>Login to Generate</CardTitle>
+                        <CardDescription>You need to be logged in to generate voices.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button asChild>
+                            <Link href="/auth/login">
+                                <LogIn className="mr-2 h-4 w-4" />
+                                Login to Continue
+                            </Link>
+                        </Button>
+                    </CardContent>
+                </Card>
             ) : (
-                <>
-                <Bot className="mr-2 h-5 w-5" />
-                Generate Voice
-                </>
+                <Button onClick={handleGenerate} disabled={loading || !dialogue || !voice || creditState.limitReached} size="lg" className="h-14 text-lg font-bold">
+                {loading ? (
+                    <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating...
+                    </>
+                ) : (
+                    <>
+                    <Bot className="mr-2 h-5 w-5" />
+                    Generate Voice
+                    </>
+                )}
+                </Button>
             )}
-            </Button>
-        )}
+        </CardFooter>
+        </Card>
+
         {generatedItem && (
-          <div className="mt-4 w-full animate-in fade-in-50">
-             <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-background to-secondary/30 p-4 space-y-4 shadow-lg">
+        <div className="mt-4 w-full animate-in fade-in-50">
+            <div className="rounded-xl border-2 border-primary/50 bg-gradient-to-br from-background to-secondary/30 p-4 space-y-4 shadow-lg">
                 <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                         <div className="p-2 bg-primary/10 rounded-full border border-primary/20 flex-shrink-0">
@@ -250,10 +257,9 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
                         Download Now
                     </a>
                 </Button>
-             </div>
-          </div>
+            </div>
+        </div>
         )}
-      </CardFooter>
-    </Card>
+    </div>
   );
 }

@@ -115,9 +115,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         if (isMounted) {
-            setHistory(getFromLocalStorage(getHistoryKey(), []));
+            const historyKey = isAuthenticated && profile.email ? `appHistory_${profile.email}` : 'appHistory_guest';
+            setHistory(getFromLocalStorage(historyKey, []));
         }
-    }, [isMounted, getHistoryKey]);
+    }, [isMounted, isAuthenticated, profile.email]);
 
 
     const setProfile = useCallback((newProfile: UserProfile) => {
@@ -139,13 +140,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
             if (guestHistory.length > 0) {
                  userHistory = [...guestHistory, ...userHistory];
-                 // Remove duplicates, keeping the first occurrence
-                 userHistory = userHistory.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i)
-                 setInLocalStorage(userHistoryKey, userHistory);
+                 // Remove duplicates, keeping the first occurrence (which is newer if guest history is prepended)
+                 const uniqueHistory = userHistory.filter((v,i,a)=>a.findIndex(t=>(t.dialogue === v.dialogue && t.voice === v.voice))===i);
+                 setInLocalStorage(userHistoryKey, uniqueHistory);
                  localStorage.removeItem(guestHistoryKey);
+                 setHistory(uniqueHistory);
+            } else {
+                 setHistory(userHistory);
             }
             
-            setHistory(userHistory);
             setProfileState(user);
             setIsAuthenticated(true);
             setInLocalStorage('userProfile', user);
@@ -165,8 +168,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setHistory([]);
         if (typeof window !== 'undefined') {
             localStorage.removeItem('userProfile');
-            // Optional: clear guest history on logout as well
-            // localStorage.removeItem('appHistory_guest');
+            // On logout, we load the guest history.
+            setHistory(getFromLocalStorage('appHistory_guest', []));
         }
         router.push('/home');
     }, [router]);

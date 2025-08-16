@@ -68,7 +68,10 @@ function WorkspaceComponent() {
   }, [selectedVoice]);
 
   const addClonedVoice = (newVoice: Voice) => {
-    setVoices((prevVoices) => [...prevVoices, newVoice]);
+    // Add to the main list if it's not already there
+    if (!voices.some(v => v.value === newVoice.value)) {
+        setVoices(prevVoices => [...prevVoices, newVoice]);
+    }
     setActiveTab("generate");
   };
   
@@ -90,15 +93,15 @@ function WorkspaceComponent() {
             <TabsTrigger value="generate" className="text-base rounded-lg">Generate Voice</TabsTrigger>
             <TabsTrigger value="clone" className="text-base rounded-lg">Clone Voice</TabsTrigger>
           </TabsList>
-          <div className="w-full">
-            <TabsContent value="generate" className="mt-6">
+          <div className="w-full mt-6">
+            <TabsContent value="generate">
               <GenerateVoiceForm 
                 voices={voices} 
                 voiceCategories={{male: maleVoices, female: femaleVoices, unique: uniqueVoices}}
                 preselectedVoice={selectedVoice}
               />
             </TabsContent>
-            <TabsContent value="clone" className="mt-6">
+            <TabsContent value="clone">
               <CloneVoiceForm onVoiceCloned={addClonedVoice} allVoices={allVoices} />
             </TabsContent>
           </div>
