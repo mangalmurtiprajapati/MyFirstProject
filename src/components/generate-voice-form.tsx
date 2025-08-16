@@ -63,6 +63,7 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
         if (updatedItem) {
             setGeneratedItem(updatedItem);
         } else {
+            // Item was deleted from history, so remove it from view
             setGeneratedItem(null);
         }
     }
@@ -96,6 +97,7 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
       const result = await generateSyntheticVoice({ dialogue, voice });
       const duration = await getAudioDuration(result.audioDataUri);
 
+      // This is a temporary object structure. The real one is created in addHistoryItem.
       const newItemData = {
         title,
         dialogue,
@@ -105,6 +107,9 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
       };
       
       addHistoryItem(newItemData);
+
+      // The useEffect listening to `history` will set the generatedItem state
+      // with the full HistoryItem object once it's added.
 
       toast({
         title: "Voice Generated!",
@@ -133,9 +138,12 @@ export function GenerateVoiceForm({ voices, voiceCategories, preselectedVoice }:
   };
 
   useEffect(() => {
+    // This effect runs after a generation to find the newly added item in the history
+    // and set it to the `generatedItem` state for display.
     if (!loading && history.length > 0) {
-      const latestItem = history[0];
-      if (latestItem.dialogue === dialogue) {
+      // Find the latest item in history that matches the generated dialogue
+      const latestItem = history.find(item => item.dialogue === dialogue);
+      if (latestItem) {
         setGeneratedItem(latestItem);
       }
     }
