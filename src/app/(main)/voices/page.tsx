@@ -6,11 +6,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Mic, Sparkles, User as UserIcon } from "lucide-react";
+import { Check, Mic, Sparkles, User as UserIcon, Play, Loader2 } from "lucide-react";
 import Link from 'next/link';
 import { useAppContext } from '@/components/app-provider';
 import type { Voice } from '@/components/generate-voice-form';
 import Image from 'next/image';
+import { generateSyntheticVoice } from '@/ai/flows/generate-synthetic-voice';
+import { useToast } from '@/hooks/use-toast';
+import { AudioPlayer } from '@/components/audio-player';
 
 interface VoiceProfile extends Voice {
     description: string;
@@ -57,8 +60,56 @@ const uniqueVoices: VoiceProfile[] = [
   { value: "pulcherrima", label: "Celestial Singer", description: "A beautiful and melodic voice.", tone: "Melodic", category: 'unique', image: "https://placehold.co/600x400.png", hint: "celestial singer" },
 ];
 
+function VoiceProfileCard({ voice, onPreview, isGenerating, previewAudio }: { 
+    voice: VoiceProfile,
+    onPreview: (voice: VoiceProfile) => void,
+    isGenerating: boolean,
+    previewAudio: { url: string, id: string } | null,
+}) {
+    const isThisVoicePreviewing = previewAudio?.id === voice.value;
+
+    return (
+        <Card className="flex flex-col overflow-hidden transition-all hover:shadow-xl">
+            <div className="aspect-video relative overflow-hidden w-full">
+                <Image src={voice.image} alt={voice.label} fill className="object-cover" data-ai-hint={voice.hint} />
+            </div>
+            <CardHeader>
+                <CardTitle>{voice.label}</CardTitle>
+                <CardDescription className="line-clamp-2 h-[40px]">{voice.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow">
+                <div className="flex flex-wrap gap-2 items-center">
+                    <Badge variant="outline">{voice.tone}</Badge>
+                    {voice.category === 'cloned' && <Badge variant="secondary">Custom</Badge>}
+                </div>
+            </CardContent>
+            <CardFooter className="flex flex-col items-stretch gap-2">
+                {isThisVoicePreviewing && previewAudio ? (
+                    <AudioPlayer audioUrl={previewAudio.url} audioId={previewAudio.id} />
+                ) : (
+                    <Button variant="outline" onClick={() => onPreview(voice)} disabled={isGenerating}>
+                        {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
+                        Preview Voice
+                    </Button>
+                )}
+                <Button asChild className="w-full">
+                    <Link href={`/workspace?voice=${voice.value}`}>
+                        <Check className="mr-2 h-4 w-4" />
+                        Select Voice
+                    </Link>
+                </Button>
+            </CardFooter>
+        </Card>
+    )
+}
+
 export default function VoicesPage() {
-    const { history } = useAppContext(); 
+    const { history, setCurrentlyPlayingId } = useAppContext(); 
+    const { toast } = useToast();
+    const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+    const [previewAudio, setPreviewAudio] = useState<{ url: string, id: string } | null>(null);
+
+
     const clonedVoices: VoiceProfile[] = history
         .filter(h => !maleVoices.find(v => v.label === h.voice) && !femaleVoices.find(v => v.label === h.voice) && !uniqueVoices.find(v => v.label === h.voice))
         .map(h => ({ 
@@ -78,6 +129,28 @@ export default function VoicesPage() {
         female: femaleVoices,
         unique: uniqueVoices,
         cloned: clonedVoices,
+    };
+    
+    const handlePreview = async (voice: VoiceProfile) => {
+        setIsGeneratingPreview(true);
+        setPreviewAudio(null);
+        setCurrentlyPlayingId(null);
+        
+        try {
+            const dialogue = `Hello, this is a preview of the ${voice.label} voice. You can use me for your projects by selecting this card.`;
+            const result = await generateSyntheticVoice({ dialogue, voice: voice.value });
+            setPreviewAudio({ url: result.audioDataUri, id: voice.value });
+            setCurrentlyPlayingId(voice.value);
+        } catch (error) {
+             toast({
+                variant: "destructive",
+                title: "Preview Failed",
+                description: "Could not generate the voice preview. Please try again.",
+            });
+            console.error("Preview generation failed:", error);
+        } finally {
+            setIsGeneratingPreview(false);
+        }
     }
 
     return (
@@ -102,26 +175,13 @@ export default function VoicesPage() {
                         {voices.length > 0 ? (
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {voices.map(voice => (
-                                    <Card key={voice.value} className="flex flex-col overflow-hidden transition-all hover:shadow-xl">
-                                        <div className="aspect-video relative overflow-hidden w-full">
-                                            <Image src={voice.image} alt={voice.label} fill className="object-cover" data-ai-hint={voice.hint} />
-                                        </div>
-                                        <CardHeader>
-                                            <CardTitle>{voice.label}</CardTitle>
-                                            <CardDescription className="line-clamp-2 h-[40px]">{voice.description}</CardDescription>
-                                        </CardHeader>
-                                        <CardContent className="flex-grow">
-                                            <Badge variant="outline">{voice.tone}</Badge>
-                                        </CardContent>
-                                        <CardFooter>
-                                            <Button asChild className="w-full">
-                                                <Link href={`/workspace?voice=${voice.value}`}>
-                                                    <Check className="mr-2 h-4 w-4" />
-                                                    Select Voice
-                                                </Link>
-                                            </Button>
-                                        </CardFooter>
-                                    </Card>
+                                    <VoiceProfileCard 
+                                        key={voice.value}
+                                        voice={voice}
+                                        onPreview={handlePreview}
+                                        isGenerating={isGeneratingPreview && !previewAudio}
+                                        previewAudio={previewAudio}
+                                    />
                                 ))}
                             </div>
                         ) : (
