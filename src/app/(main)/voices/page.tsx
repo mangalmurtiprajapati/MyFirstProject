@@ -60,14 +60,13 @@ const uniqueVoices: VoiceProfile[] = [
   { value: "pulcherrima", label: "Celestial Singer", description: "A beautiful and melodic voice.", tone: "Melodic", category: 'unique', image: "https://placehold.co/600x400.png", hint: "celestial singer" },
 ];
 
-function VoiceProfileCard({ voice, onPreview, isGenerating, previewAudio }: { 
-    voice: VoiceProfile,
-    onPreview: (voice: VoiceProfile) => void,
-    isGenerating: boolean,
-    previewAudio: { url: string, id: string } | null,
+function VoiceProfileCard({ voice, onPreview, isGenerating, isPlaying, previewAudioUrl }: { 
+    voice: VoiceProfile;
+    onPreview: (voice: VoiceProfile) => void;
+    isGenerating: boolean;
+    isPlaying: boolean;
+    previewAudioUrl: string | null;
 }) {
-    const isThisVoicePreviewing = previewAudio?.id === voice.value;
-
     return (
         <Card className="flex flex-col overflow-hidden transition-all hover:shadow-xl">
             <div className="aspect-video relative overflow-hidden w-full">
@@ -84,8 +83,8 @@ function VoiceProfileCard({ voice, onPreview, isGenerating, previewAudio }: {
                 </div>
             </CardContent>
             <CardFooter className="flex flex-col items-stretch gap-2">
-                {isThisVoicePreviewing && previewAudio ? (
-                    <AudioPlayer audioUrl={previewAudio.url} audioId={previewAudio.id} />
+                {isPlaying && previewAudioUrl ? (
+                    <AudioPlayer audioUrl={previewAudioUrl} audioId={voice.value} />
                 ) : (
                     <Button variant="outline" onClick={() => onPreview(voice)} disabled={isGenerating}>
                         {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
@@ -104,11 +103,10 @@ function VoiceProfileCard({ voice, onPreview, isGenerating, previewAudio }: {
 }
 
 export default function VoicesPage() {
-    const { history, setCurrentlyPlayingId } = useAppContext(); 
+    const { history, setCurrentlyPlayingId, currentlyPlayingId } = useAppContext(); 
     const { toast } = useToast();
-    const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+    const [generatingPreviewId, setGeneratingPreviewId] = useState<string | null>(null);
     const [previewAudio, setPreviewAudio] = useState<{ url: string, id: string } | null>(null);
-
 
     const clonedVoices: VoiceProfile[] = history
         .filter(h => !maleVoices.find(v => v.label === h.voice) && !femaleVoices.find(v => v.label === h.voice) && !uniqueVoices.find(v => v.label === h.voice))
@@ -132,7 +130,7 @@ export default function VoicesPage() {
     };
     
     const handlePreview = async (voice: VoiceProfile) => {
-        setIsGeneratingPreview(true);
+        setGeneratingPreviewId(voice.value);
         setPreviewAudio(null);
         setCurrentlyPlayingId(null);
         
@@ -149,7 +147,7 @@ export default function VoicesPage() {
             });
             console.error("Preview generation failed:", error);
         } finally {
-            setIsGeneratingPreview(false);
+            setGeneratingPreviewId(null);
         }
     }
 
@@ -179,8 +177,9 @@ export default function VoicesPage() {
                                         key={voice.value}
                                         voice={voice}
                                         onPreview={handlePreview}
-                                        isGenerating={isGeneratingPreview && !previewAudio}
-                                        previewAudio={previewAudio}
+                                        isGenerating={generatingPreviewId === voice.value}
+                                        isPlaying={currentlyPlayingId === voice.value}
+                                        previewAudioUrl={previewAudio?.id === voice.value ? previewAudio.url : null}
                                     />
                                 ))}
                             </div>
