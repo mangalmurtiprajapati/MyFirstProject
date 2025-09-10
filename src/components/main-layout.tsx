@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator } from "./ui/sidebar";
 import { VocalForgeLogo } from "./vocal-forge-logo";
 import { AnimatedHeader } from './animated-header';
-import { Home, Settings, Mic, History, Star, User, Users } from 'lucide-react';
+import { Home, Settings, Mic, History, Star, User, Users, BookOpen } from 'lucide-react';
 import { AppFooter } from './app-footer';
 
 const navItems = [
@@ -17,6 +17,7 @@ const navItems = [
 ];
 
 const bottomNavItems = [
+    { href: "/learn-more", icon: BookOpen, label: "Learn More" },
     { href: "/profile", icon: User, label: "Profile" },
     { href: "/settings", icon: Settings, label: "Settings" },
 ];
